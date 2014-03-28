@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ruby | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-03-28T22:33:26+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[markdownからHTMLスライドをつくるgemを書いた]]></title>
+    <link href="http://massat.github.io/blog/2012/04/05/markdown-slider/"/>
+    <updated>2012-04-05T23:48:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/04/05/markdown-slider</id>
+    <content type="html"><![CDATA[<p>カンタンな文書を書くのに便利なmarkdown。
+このブログもエントリはmarkdownで書いていて、今後もドキュメントはなるべくmarkdownにしたいなと。</p>
+
+<p>んでRubyをさわってみたくて、試しにと思ってmarkdownからHTMLスライドを作るgemを書いた。</p>
+
+<!-- more -->
+
+
+<h2>markdown_slider</h2>
+
+<p><a href="https://github.com/massat/markdown_slider">markdown_slider</a></p>
+
+<p>理想は <a href="http://github.github.com/github-flavored-markdown/">GitHub Flavored Markdown</a> ちっくに書けて、そっからイケてるスライドを生成できるツール。</p>
+
+<p>なんだけど、完成度はまだまだ。</p>
+
+<p>markdownパーサーには <a href="https://github.com/tanoku/redcarpet">redcarpet</a>、生成するHTMLは<a href="http://code.google.com/p/html5slides/">html5slides</a>をちょっといじったものを使ってる。</p>
+
+<h3>インストール</h3>
+
+<p>gemコマンドでインストール。</p>
+
+<p><code>sh
+$ gem install markdown_slider
+</code></p>
+
+<h3>使いかた</h3>
+
+<p>markdownを書いて</p>
+
+<pre><code>プレゼンタイトル
+=============
+
+セクションタイトル
+---------------
+
+### スライドタイトル
+
+あいうえお
+
+### スライドタイトル
+
+``` ruby
+STDOUT.puts 'Hello, world!'
+```
+</code></pre>
+
+<p><code>md-slider</code>コマンドでスライド化</p>
+
+<p><code>sh
+$ md-slider path/to/markdown &gt; path/to/slide.html
+</code></p>
+
+<p>すると、JavascriptとCSSも一体になったHTMLができあがる。</p>
+
+<p>上の例のmarkdownからスライド生成をすると、<a href="/slides/markdown_slider-sample1.html">こちら</a>のようになる。
+ブログエントリをそのままスライドに！とはいかなくて、ブログエントリをそのまま <code>md-slider</code> すると<a href="/slides/markdown_slider-sample2.html">こんな感じ</a>になってしまう。
+ブログエントリそのままーの場合は、Jekyllのプラグインとかにしないとだめそう。</p>
+
+<h3>まとめ</h3>
+
+<p>そもそもはRubyが触りたかった。Perlでは苦しんだけど、Ruby結構すんなり書けた。
+できあがるスライドがちょっと使い勝手悪いので、html5slidesじゃないガワにしようかなーと思っている。
+てか、CSS/JS力が足りないだけか。そのうちガサッと変えちゃうかも。impress.jsとか？</p>
+]]></content>
+  </entry>
+  
+</feed>

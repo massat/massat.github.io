@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Vagrant | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/vagrant/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-03-28T22:33:26+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ansibleの手習いをvagrantにてする]]></title>
+    <link href="http://massat.github.io/blog/2014/03/27/vagrant-ansible/"/>
+    <updated>2014-03-27T22:49:00+09:00</updated>
+    <id>http://massat.github.io/blog/2014/03/27/vagrant-ansible</id>
+    <content type="html"><![CDATA[<p>ansibleがよさげなので<a href="http://docs.ansible.com/intro_getting_started.html">これ</a>みながらvagrantとつなげてみる。</p>
+
+<!--more-->
+
+
+<h2>準備</h2>
+
+<h3>vagrant</h3>
+
+<p><a href="http://docs.vagrantup.com/v2/getting-started/index.html">このへん</a>みて。
+<code>homebrew-cask</code>と<code>brewfile</code>でいけるらしい。未来。</p>
+
+<h3>ansible</h3>
+
+<p><code>
+➜  ~  brew install ansible
+</code>
+で済ませた。</p>
+
+<h2>provisioningするホストの用意</h2>
+
+<p>vagrantで用意する。
+<code>ubuntu 13.04</code>にした。</p>
+
+<p><code>sh
+➜  ~  vagrant box add ubuntu13.04 http://cloud-images.ubuntu.com/vagrant/raring/current/raring-server-cloudimg-amd64-vagrant-disk1.box
+➜  ~  mkdir -p ~/Workspace/ansible/
+➜  ~  cd ~/Workspace/ansible
+➜  ansible  vagrant init
+</code></p>
+
+<p>Vagrantfile の<code>config.vm.box</code>でさっきのboxを指定して</p>
+
+<p>```ruby
+  # &hellip;</p>
+
+<p>  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = &ldquo;ubuntu13.04&rdquo;</p>
+
+<p>  # &hellip;
+```</p>
+
+<p>手っ取り早く起動。</p>
+
+<p>```sh
+➜  ansible  vagrant up
+Bringing machine &lsquo;default&rsquo; up with &lsquo;virtualbox&rsquo; provider&hellip;
+==> default: Importing base box &lsquo;ubuntu13.04&rsquo;&hellip;
+==> default: Matching MAC address for NAT networking&hellip;
+==> default: Setting the name of the VM: ansible_default_1395929701950_33564
+==> default: Clearing any previously set forwarded ports&hellip;
+==> default: Clearing any previously set network interfaces&hellip;
+==> default: Preparing network interfaces based on configuration&hellip;</p>
+
+<pre><code>default: Adapter 1: nat
+</code></pre>
+
+<p>==> default: Forwarding ports&hellip;</p>
+
+<pre><code>default: 22 =&gt; 2222 (adapter 1)
+</code></pre>
+
+<p>==> default: Booting VM&hellip;
+==> default: Waiting for machine to boot. This may take a few minutes&hellip;</p>
+
+<pre><code>default: SSH address: 127.0.0.1:2222
+default: SSH username: vagrant
+default: SSH auth method: private key
+default: Error: Connection timeout. Retrying...
+</code></pre>
+
+<p>==> default: Machine booted and ready!
+==> default: Checking for guest additions in VM&hellip;</p>
+
+<pre><code>default: The guest additions on this VM do not match the installed version of
+default: VirtualBox! In most cases this is fine, but in rare cases it can
+default: prevent things such as shared folders from working properly. If you see
+default: shared folder errors, please make sure the guest additions within the
+default: virtual machine match the version of VirtualBox you have installed on
+default: your host and reload your VM.
+default:
+default: Guest Additions Version: 4.2.10
+default: VirtualBox Version: 4.3
+</code></pre>
+
+<p>==> default: Mounting shared folders&hellip;</p>
+
+<pre><code>default: /vagrant =&gt; /Users/massat/Workspace/ansible
+</code></pre>
+
+<p>➜  ansible
+```</p>
+
+<h2>ansibleの設定</h2>
+
+<p><a href="http://docs.ansible.com/intro_getting_started.html">これ</a>にしたがって進む。</p>
+
+<h3>inventry</h3>
+
+<p>ansibleが対象にするホストは<code>inventry</code>として指定するらしい。
+詳しい書式は<a href="http://docs.ansible.com/intro_inventory.html">このへん</a>。</p>
+
+<p>上記で起動したホストを指定する。
+さっきの起動ログに</p>
+
+<p><code>sh
+default: SSH address: 127.0.0.1:2222
+</code></p>
+
+<p>とあるので</p>
+
+<p><code>sh
+➜  ansible  echo '127.0.0.1:2222' &gt; hosts
+</code></p>
+
+<p>した。</p>
+
+<h3>ホストへssh接続</h3>
+
+<p>このホストは</p>
+
+<p><code>sh
+➜  ansible  ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
+</code></p>
+
+<p>でssh接続できるので、</p>
+
+<p>```sh
+➜  ansible  ansible all -m ping -i hosts -u vagrant &mdash;private-key=~/.vagrant.d/insecure_private_key
+127.0.0.1 | success >> {</p>
+
+<pre><code>"changed": false,
+"ping": "pong"
+</code></pre>
+
+<p>}
+```</p>
+
+<p>で接続できる。</p>
+
+<h3>commandの実行</h3>
+
+<p><code>-m</code>オプションは、ansibleのmoduleを指定するオプションで、デフォルトは<code>command</code>となる。
+<code>command</code>で、ssh越しにコマンドを送りつけることができる。</p>
+
+<p><code>sh
+➜  ansible  ansible all -a '/bin/cat /etc/hostname'  -i hosts -u vagrant --private-key=~/.vagrant.d/insecure_private_key --sudo
+127.0.0.1 | success | rc=0 &gt;&gt;
+vagrant-ubuntu-raring-64
+</code></p>
+
+<p>なるほどねー。</p>
+]]></content>
+  </entry>
+  
+</feed>

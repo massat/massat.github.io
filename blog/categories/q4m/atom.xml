@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Q4m | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/q4m/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-03-28T22:33:26+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Amazon Linux AMIにQ4Mをインストール]]></title>
+    <link href="http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/"/>
+    <updated>2012-04-08T17:57:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami</id>
+    <content type="html"><![CDATA[<p>今運用しているサービスでそろそろジョブキューが必要となりそう。
+インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
+Q4Mはソースからではなく、ビルド済のパッケージを使う。</p>
+
+<!-- more -->
+
+
+<p>EC2でmicroインスタンスたちあげて、Q4Mをインストール。
+AMIにはAmazon Linux AMIを使用した。
+このエントリ時点のAMIのバージョンは<code>amzn-ami-pv-2012.03.1.x86_64-ebs (ami-e47acbe5)</code>。</p>
+
+<h2>MySQLのインストール</h2>
+
+<p>Officialのrpmをつかってインストール。
+現在配布されている最新のビルド済Q4MはMySQL5.1.55向けのもの。
+MySQLサイトからRPMをダウンロードしてインストール。</p>
+
+<p>``` sh</p>
+
+<h1>wget <a href="http://downloads.mysql.com/archives/mysql-5.1/MySQL-server-5.1.55-1.glibc23.x86_64.rpm">http://downloads.mysql.com/archives/mysql-5.1/MySQL-server-5.1.55-1.glibc23.x86_64.rpm</a></h1>
+
+<h1>wget <a href="http://downloads.mysql.com/archives/mysql-5.1/MySQL-client-5.1.55-1.glibc23.x86_64.rpm">http://downloads.mysql.com/archives/mysql-5.1/MySQL-client-5.1.55-1.glibc23.x86_64.rpm</a></h1>
+
+<h1>rpm -ivh MySQL-server-5.1.55-1.glibc23.x86_64.rpm</h1>
+
+<h1>rpm -ivh MySQL-client-5.1.55-1.glibc23.x86_64.rpm</h1>
+
+<p>```</p>
+
+<h2>Q4Mのインストール</h2>
+
+<p>MySQLが<code>--with-fast-mutexes</code>オプションを使ってコンパイルされているかどうかで使用するQ4Mのパッケージが変わる。</p>
+
+<p>``` sh</p>
+
+<h1>cat <code>which mysqlbug</code> | grep CONFIGURE_LINE</h1>
+
+<p>CONFIGURE_LINE=&ldquo;./configure  &lsquo;&mdash;with-mysqld-ldflags=-static&rsquo; &lsquo;&mdash;with-client-ldflags=-static&rsquo; &lsquo;&mdash;enable-assembler&rsquo; &lsquo;&mdash;enable-local-infile&rsquo; &lsquo;&mdash;with-fast-mutexes&rsquo; &lsquo;&mdash;with-mysqld-user=mysql&rsquo; &lsquo;&mdash;with-unix-socket-path=/var/lib/mysql/mysql.sock&rsquo; &lsquo;&mdash;with-pic&rsquo; &lsquo;&mdash;prefix=/&rsquo; &lsquo;&mdash;with-extra-charsets=complex&rsquo; &lsquo;&mdash;with-ssl&rsquo; &lsquo;&mdash;exec-prefix=/usr&rsquo; &lsquo;&mdash;libexecdir=/usr/sbin&rsquo; &lsquo;&mdash;libdir=/usr/lib64&rsquo; &lsquo;&mdash;sysconfdir=/etc&rsquo; &lsquo;&mdash;datadir=/usr/share&rsquo; &lsquo;&mdash;localstatedir=/var/lib/mysql&rsquo; &lsquo;&mdash;infodir=/usr/share/info&rsquo; &lsquo;&mdash;includedir=/usr/include&rsquo; &lsquo;&mdash;mandir=/usr/share/man&rsquo; &lsquo;&mdash;enable-thread-safe-client&rsquo; &lsquo;&mdash;with-comment=MySQL Community Server (GPL)&rsquo; &lsquo;&mdash;with-readline&rsquo; &lsquo;&mdash;with-zlib-dir=bundled&rsquo; &lsquo;&mdash;without-plugin-ndbcluster&rsquo; &lsquo;&mdash;with-plugin-innobase&rsquo; &lsquo;&mdash;without-plugin-innodb_plugin&rsquo; &lsquo;&mdash;with-plugin-partition&rsquo; &lsquo;&mdash;with-plugin-csv&rsquo; &lsquo;&mdash;with-plugin-archive&rsquo; &lsquo;&mdash;with-plugin-blackhole&rsquo; &lsquo;&mdash;with-plugin-federated&rsquo; &lsquo;&mdash;without-plugin-daemon_example&rsquo; &lsquo;&mdash;without-plugin-ftexample&rsquo; &lsquo;&mdash;with-embedded-server&rsquo; &lsquo;&mdash;with-big-tables&rsquo; &lsquo;&mdash;enable-shared&rsquo; &lsquo;CC=gcc&rsquo; &lsquo;CFLAGS=-O2 -g -pipe&rsquo; &lsquo;LDFLAGS=&rsquo; &lsquo;CXX=gcc&rsquo; &lsquo;CXXFLAGS=-O2 -g -pipe -felide-constructors -fno-exceptions -fno-rtti &rsquo;&rdquo;
+<code>test -n "$CONFIGURE_LINE"  &amp;&amp; echo "Configure command: $CONFIGURE_LINE"</code>
+```</p>
+
+<p>コンパイルオプションに<code>--with-fast-mutexes</code>があるので、それ用のパッケージをDLしてインストールする。</p>
+
+<p>``` sh</p>
+
+<h1>wget <a href="http://q4m.kazuhooku.com/dist/mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz">http://q4m.kazuhooku.com/dist/mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz</a></h1>
+
+<h1>tar xzf mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz</h1>
+
+<h1>cd q4m-0.9.5-linux-unknown/</h1>
+
+<h1>cp support-files/q4m-forward /usr/bin/</h1>
+
+<h1>cp libqueue_engine.so /usr/lib64/mysql/plugin/</h1>
+
+<h1>mysql &lt; support-files/install.sql</h1>
+
+<p>```</p>
+
+<h2>動作確認</h2>
+
+<p>``` sh</p>
+
+<h1>mysql</h1>
+
+<p>Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 3
+Server version: 5.1.55 MySQL Community Server (GPL)</p>
+
+<p>Copyright &copy; 2000, 2010, Oracle and/or its affiliates. All rights reserved.
+This software comes with ABSOLUTELY NO WARRANTY. This is free software,
+and you are welcome to modify and redistribute it under the GPL v2 license</p>
+
+<p>Type &lsquo;help;&rsquo; or &lsquo;\h&rsquo; for help. Type &lsquo;\c&rsquo; to clear the current input statement.</p>
+
+<p>mysql> show engines;
++&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
+| Engine     | Support | Comment                                                        | Transactions | XA   | Savepoints |
++&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
+| InnoDB     | YES     | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| MRG_MYISAM | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| QUEUE      | YES     | Queue storage engine for MySQL                                 | NO           | NO   | NO         |
+| CSV        | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| MEMORY     | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| FEDERATED  | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+| ARCHIVE    | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+| BLACKHOLE  | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| MyISAM     | DEFAULT | Default engine as of MySQL 3.23 with great performance         | NO           | NO   | NO         |
++&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+
+9 rows in set (0.00 sec)
+```</p>
+
+<p><code>QUEUE</code>エンジンが確認できた。</p>
+
+<h2>まとめ</h2>
+
+<p>とりあえずインストールだけ。
+worker書いたりはまた後日。Rubyで書くつもり。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Mac | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/mac/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-03-28T22:33:26+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Mountain Lion にPHP開発環境をつくった]]></title>
+    <link href="http://massat.github.io/blog/2012/11/24/setup-php-on-mountain-lion/"/>
+    <updated>2012-11-24T23:05:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/11/24/setup-php-on-mountain-lion</id>
+    <content type="html"><![CDATA[<p>クリーンインストールしてからのPHP環境構築ログ。</p>
+
+<!-- more -->
+
+
+<h2>準備</h2>
+
+<p>ログインシェルをzshにしたりとかemacsいれたりとかいろいろやったけど、
+PHP環境に関係ある話としては</p>
+
+<ul>
+<li><a href="https://developer.apple.com/downloads/index.action">Command Line Tools for Xcode</a> をインストール</li>
+<li><a href="http://mxcl.github.com/homebrew/">Homebrew</a> をインストール</li>
+</ul>
+
+
+<p>くらい。</p>
+
+<h2>パッケージインストール</h2>
+
+<p>レポジトリ追加して</p>
+
+<p><code>sh
+$ brew tap homebrew/dupes
+$ brew tap josegonzalez/php
+</code></p>
+
+<p>開発で使うあたりをつらつら追加</p>
+
+<p><code>sh
+$ brew install make
+$ brew install httpd mysql memcached mongodb
+</code></p>
+
+<p>PHP</p>
+
+<p><code>sh
+$ brew install php53 --with-mysql
+$ brew install php53-memcache php53-mongo php53-redis
+$ brew install phpsh
+</code></p>
+
+<h2>設定&amp;起動</h2>
+
+<p>phpの設定ファイルは <code>/usr/local/etc/php/</code> あたり、
+apacheの設定ファイルは <code>/usr/local/etc/apache2/</code> あたりにあるのでVirtualHostをよしなに設定する。</p>
+
+<p>apacheは <code>/usr/local/sbin/apachectl</code> あたり、
+mysqlは <code>/usr/local/bin/mysql.server</code> あたりで起動する。</p>
+]]></content>
+  </entry>
+  
+</feed>

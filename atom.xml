@@ -1,0 +1,1135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[massat log]]></title>
+  <link href="http://massat.github.io/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-03-28T22:33:26+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Ansibleの手習いをvagrantにてする]]></title>
+    <link href="http://massat.github.io/blog/2014/03/27/vagrant-ansible/"/>
+    <updated>2014-03-27T22:49:00+09:00</updated>
+    <id>http://massat.github.io/blog/2014/03/27/vagrant-ansible</id>
+    <content type="html"><![CDATA[<p>ansibleがよさげなので<a href="http://docs.ansible.com/intro_getting_started.html">これ</a>みながらvagrantとつなげてみる。</p>
+
+<!--more-->
+
+
+<h2>準備</h2>
+
+<h3>vagrant</h3>
+
+<p><a href="http://docs.vagrantup.com/v2/getting-started/index.html">このへん</a>みて。
+<code>homebrew-cask</code>と<code>brewfile</code>でいけるらしい。未来。</p>
+
+<h3>ansible</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>➜  ~  brew install ansible</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で済ませた。</p>
+
+<h2>provisioningするホストの用意</h2>
+
+<p>vagrantで用意する。
+<code>ubuntu 13.04</code>にした。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ~  vagrant box add ubuntu13.04 http://cloud-images.ubuntu.com/vagrant/raring/current/raring-server-cloudimg-amd64-vagrant-disk1.box
+</span><span class='line'>➜  ~  mkdir -p ~/Workspace/ansible/
+</span><span class='line'>➜  ~  <span class="nb">cd</span> ~/Workspace/ansible
+</span><span class='line'>➜  ansible  vagrant init
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Vagrantfile の<code>config.vm.box</code>でさっきのboxを指定して</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="c1"># ...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Every Vagrant virtual environment requires a box to build off of.</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;ubuntu13.04&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># ...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>手っ取り早く起動。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ansible  vagrant up
+</span><span class='line'>Bringing machine <span class="s1">&#39;default&#39;</span> up with <span class="s1">&#39;virtualbox&#39;</span> provider...
+</span><span class='line'><span class="o">==</span>&gt; default: Importing base box <span class="s1">&#39;ubuntu13.04&#39;</span>...
+</span><span class='line'><span class="o">==</span>&gt; default: Matching MAC address <span class="k">for </span>NAT networking...
+</span><span class='line'><span class="o">==</span>&gt; default: Setting the name of the VM: <span class="nv">ansible_default_1395929701950_33564</span>
+</span><span class='line'><span class="o">==</span>&gt; default: Clearing any previously <span class="nb">set </span>forwarded ports...
+</span><span class='line'><span class="o">==</span>&gt; default: Clearing any previously <span class="nb">set </span>network interfaces...
+</span><span class='line'><span class="o">==</span>&gt; default: Preparing network interfaces based on configuration...
+</span><span class='line'>    default: Adapter 1: <span class="nv">nat</span>
+</span><span class='line'><span class="o">==</span>&gt; default: Forwarding ports...
+</span><span class='line'>    default: <span class="nv">22</span> <span class="o">=</span>&gt; 2222 <span class="o">(</span>adapter 1<span class="o">)</span>
+</span><span class='line'><span class="o">==</span>&gt; default: Booting VM...
+</span><span class='line'><span class="o">==</span>&gt; default: Waiting <span class="k">for </span>machine to boot. This may take a few minutes...
+</span><span class='line'>    default: SSH address: 127.0.0.1:2222
+</span><span class='line'>    default: SSH username: vagrant
+</span><span class='line'>    default: SSH auth method: private key
+</span><span class='line'>    default: Error: Connection timeout. Retrying...
+</span><span class='line'><span class="o">==</span>&gt; default: Machine booted and ready!
+</span><span class='line'><span class="o">==</span>&gt; default: Checking <span class="k">for </span>guest additions in VM...
+</span><span class='line'>    default: The guest additions on this VM <span class="k">do </span>not match the installed version of
+</span><span class='line'>    default: VirtualBox! In most cases this is fine, but in rare cases it can
+</span><span class='line'>    default: prevent things such as shared folders from working properly. If you see
+</span><span class='line'>    default: shared folder errors, please make sure the guest additions within the
+</span><span class='line'>    default: virtual machine match the version of VirtualBox you have installed on
+</span><span class='line'>    default: your host and reload your VM.
+</span><span class='line'>    default:
+</span><span class='line'>    default: Guest Additions Version: 4.2.10
+</span><span class='line'>    default: VirtualBox Version: 4.3
+</span><span class='line'><span class="o">==</span>&gt; default: Mounting shared folders...
+</span><span class='line'>    default: /vagrant <span class="o">=</span>&gt; /Users/massat/Workspace/ansible
+</span><span class='line'>➜  ansible
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>ansibleの設定</h2>
+
+<p><a href="http://docs.ansible.com/intro_getting_started.html">これ</a>にしたがって進む。</p>
+
+<h3>inventry</h3>
+
+<p>ansibleが対象にするホストは<code>inventry</code>として指定するらしい。
+詳しい書式は<a href="http://docs.ansible.com/intro_inventory.html">このへん</a>。</p>
+
+<p>上記で起動したホストを指定する。
+さっきの起動ログに</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>default: SSH address: 127.0.0.1:2222
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>とあるので</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ansible  <span class="nb">echo</span> <span class="s1">&#39;127.0.0.1:2222&#39;</span> &gt; hosts
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>した。</p>
+
+<h3>ホストへssh接続</h3>
+
+<p>このホストは</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ansible  ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>でssh接続できるので、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ansible  ansible all -m ping -i hosts -u vagrant --private-key<span class="o">=</span>~/.vagrant.d/insecure_private_key
+</span><span class='line'>127.0.0.1 | success &gt;&gt; <span class="o">{</span>
+</span><span class='line'>    <span class="s2">&quot;changed&quot;</span>: <span class="nb">false</span>,
+</span><span class='line'>    <span class="s2">&quot;ping&quot;</span>: <span class="s2">&quot;pong&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で接続できる。</p>
+
+<h3>commandの実行</h3>
+
+<p><code>-m</code>オプションは、ansibleのmoduleを指定するオプションで、デフォルトは<code>command</code>となる。
+<code>command</code>で、ssh越しにコマンドを送りつけることができる。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ansible  ansible all -a <span class="s1">&#39;/bin/cat /etc/hostname&#39;</span>  -i hosts -u vagrant --private-key<span class="o">=</span>~/.vagrant.d/insecure_private_key --sudo
+</span><span class='line'>127.0.0.1 | success | <span class="nv">rc</span><span class="o">=</span>0 &gt;&gt;
+</span><span class='line'>vagrant-ubuntu-raring-64
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>なるほどねー。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Amazon AMIにmroongaをインストールする]]></title>
+    <link href="http://massat.github.io/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/"/>
+    <updated>2013-08-20T18:08:00+09:00</updated>
+    <id>http://massat.github.io/blog/2013/08/20/install-mroonga-on-amazon-linux-ami</id>
+    <content type="html"><![CDATA[<p>EC2上にmroongaによって全文検索可能なDBを構築した。</p>
+
+<!-- more -->
+
+
+<h1>環境</h1>
+
+<ul>
+<li>amzn-ami-pv-2013.03.1.x86_64-ebs (ami-39b23d38)</li>
+<li>mysql5.6.13</li>
+<li>groonga3.06</li>
+<li>mroonga3.06</li>
+</ul>
+
+
+<p>mysqlはオフィシャルで配布してるrpmパッケージから。
+groonga、mroongaはソースからビルドしてインストールした。</p>
+
+<h1>準備</h1>
+
+<h3>checkinstall</h3>
+
+<p>ソースからビルドするものについても、checkinstallでrpm化してインストールする。
+64bit版のAMIにcheckinstallをインストールする手順は<a href="http://massat.jp/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/">こちら</a>を参照</p>
+
+<h1>MySQLのインストール</h1>
+
+<p>オフィシャルで配布されている Linux Generic な rpm をインストール</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>~ <span class="c"># rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-shared-compat-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/</span>
+</span><span class='line'>~ <span class="c"># rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-server-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/</span>
+</span><span class='line'>~ <span class="c"># rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-devel-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/</span>
+</span><span class='line'>~ <span class="c"># rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-client-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>デフォルトの<code>my.cnf</code>の場所が<code>/usr/my.cnf</code>になったみたい。
+あと、mysql5.6からはデフォルトの<code>sql_mode</code>が変わって<a href="https://www.google.co.jp/search?q=mysql+5.6+sql_mode">よくエラーになるらしいので注意</a></p>
+
+<h1>MeCabのインストール</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>~ <span class="c"># yum install mecab mecab-devel mecab-ipadic</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>groongaのインストール</h1>
+
+<h3>ビルドに必要なライブラリ</h3>
+
+<p>要らないものもあるかも</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>~ <span class="c"># yum install gcc-c++ make automake libtool</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>インストール</h3>
+
+<p>だいたいは<a href="http://groonga.org/ja/docs/install/centos.html#build-from-source">ここ</a>の手順に従った。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>~ <span class="c"># cd /usr/local/src/</span>
+</span><span class='line'>src <span class="c"># wget http://packages.groonga.org/source/groonga/groonga-3.0.6.tar.gz</span>
+</span><span class='line'>src <span class="c"># tar xzf groonga-3.0.6.tar.gz</span>
+</span><span class='line'>src <span class="c"># cd groonga-3.0.6</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># ./configure</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># make -j$(grep &#39;^processor&#39; /proc/cpuinfo | wc -l)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>んで、<code>make install</code> ではなくて <code>checkinstall</code> でrpmにする。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>groonga-3.0.6 <span class="c"># checkinstall</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>だけどコケる。
+checkinstallがmake中に、どうやら必要なディレクトリが作れていない。
+試行錯誤の末、以下のディレクトリを作ればビルドできる（と思う）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/include/groonga/groonga</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/lib/groonga/plugins/tokenizers</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/lib/groonga/plugins/suggest</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/lib/groonga/plugins/table</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/lib/groonga/plugins/query_expanders</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/etc/groonga</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/var/run/groonga</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/var/log/groonga/httpd</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/groonga/examples/dictionary/edict</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/groonga/examples/dictionary/html/css/smoothness/images</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/groonga/images/logo</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/doc/groonga/en/html/reference/command</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/doc/groonga/en/html/_sources/contribution/development</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/doc/groonga/en/html/_sources/reference/api</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/doc/groonga/en/html/server/http</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># mkdir -p /usr/local/share/doc/groonga/en/html/_sources/server/http</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>その上で、checkinstallでrpmを作ってインストール</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>groonga-3.0.6 <span class="c"># checkinstall</span>
+</span><span class='line'>groonga-3.0.6 <span class="c"># rpm -ivh /root/rpmbuild/RPMS/x86_64/groonga-3.0.6-1.x86_64.rpm</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>mroongaのインストール</h3>
+
+<p>手順はほぼ<a href="http://mroonga.org/ja/docs/install.html#install-from-the-source-code">こちら</a>の通り</p>
+
+<p>まずはMySQLのソースコードがmroongaのビルドに必要なので落としてくる。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>src <span class="c"># wget http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.13.tar.gz/from/http://cdn.mysql.com/</span>
+</span><span class='line'>src <span class="c"># tar xzf mysql-5.6.13.tar.gz</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>mroongaのソースコードを取得後、ビルドしてインストール。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>src <span class="c"># wget http://packages.groonga.org/source/mroonga/mroonga-3.06.tar.gz</span>
+</span><span class='line'>src <span class="c"># tar xzf mroonga-3.06.tar.gz</span>
+</span><span class='line'>src <span class="c"># cd mroonga-3.06</span>
+</span><span class='line'>mroonga-3.06 <span class="c"># ./configure PKG_CONFIG_PATH=/usr/local/lib/pkgconfig  --with-mysql-source=/usr/local/src/mysql-5.6.13 --with-mysql-config=/usr/bin/mysql_config</span>
+</span><span class='line'>mroonga-3.06 <span class="c"># make</span>
+</span><span class='line'>mroonga-3.06 <span class="c"># checkinstall</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>んが、groongaの時と同様に、ディレクトリが作れずこける。
+ので、手対応。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mroonga-3.06 <span class="c"># mkdir -p &#39;/usr/local/share/doc/mroonga/en/html/_sources/dev</span>
+</span><span class='line'>mroonga-3.06 <span class="c"># mkdir -p &#39;/usr/local/share/doc/mroonga/source/reference&#39;</span>
+</span><span class='line'>mroonga-3.06 <span class="c"># checkinstall</span>
+</span><span class='line'>mroonga-3.06 <span class="c"># rpm -ivh /root/rpmbuild/RPMS/x86_64/mroonga-3.06-1.x86_64.rpm</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>MySQL起動後、mroongaをプラグインとしてインストールする。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="n">INSTALL</span> <span class="n">PLUGIN</span> <span class="n">mroonga</span> <span class="n">SONAME</span> <span class="s1">&#39;ha_mroonga.so&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">0</span> <span class="k">rows</span> <span class="n">affected</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">30</span> <span class="n">sec</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">CREATE</span> <span class="k">FUNCTION</span> <span class="n">last_insert_grn_id</span> <span class="k">RETURNS</span> <span class="nb">INTEGER</span> <span class="n">SONAME</span> <span class="s1">&#39;ha_mroonga.so&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">0</span> <span class="k">rows</span> <span class="n">affected</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span> <span class="n">sec</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">CREATE</span> <span class="k">FUNCTION</span> <span class="n">mroonga_snippet</span> <span class="k">RETURNS</span> <span class="n">STRING</span> <span class="n">SONAME</span> <span class="s1">&#39;ha_mroonga.so&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">0</span> <span class="k">rows</span> <span class="n">affected</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span> <span class="n">sec</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">CREATE</span> <span class="k">FUNCTION</span> <span class="n">mroonga_command</span> <span class="k">RETURNS</span> <span class="n">STRING</span> <span class="n">SONAME</span> <span class="s1">&#39;ha_mroonga.so&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">OK</span><span class="p">,</span> <span class="mi">0</span> <span class="k">rows</span> <span class="n">affected</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span> <span class="n">sec</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">mysql</span><span class="o">&gt;</span> <span class="k">show</span> <span class="n">engines</span><span class="p">;</span>
+</span><span class='line'><span class="o">+</span><span class="c1">--------------------+---------+----------------------------------------------------------------+--------------+------+------------+</span>
+</span><span class='line'><span class="o">|</span> <span class="n">Engine</span>             <span class="o">|</span> <span class="n">Support</span> <span class="o">|</span> <span class="k">Comment</span>                                                        <span class="o">|</span> <span class="n">Transactions</span> <span class="o">|</span> <span class="n">XA</span>   <span class="o">|</span> <span class="n">Savepoints</span> <span class="o">|</span>
+</span><span class='line'><span class="o">+</span><span class="c1">--------------------+---------+----------------------------------------------------------------+--------------+------+------------+</span>
+</span><span class='line'><span class="o">|</span> <span class="n">InnoDB</span>             <span class="o">|</span> <span class="k">DEFAULT</span> <span class="o">|</span> <span class="n">Supports</span> <span class="n">transactions</span><span class="p">,</span> <span class="k">row</span><span class="o">-</span><span class="k">level</span> <span class="n">locking</span><span class="p">,</span> <span class="k">and</span> <span class="k">foreign</span> <span class="n">keys</span>     <span class="o">|</span> <span class="n">YES</span>          <span class="o">|</span> <span class="n">YES</span>  <span class="o">|</span> <span class="n">YES</span>        <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">MRG_MYISAM</span>         <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">Collection</span> <span class="k">of</span> <span class="n">identical</span> <span class="n">MyISAM</span> <span class="n">tables</span>                          <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">CSV</span>                <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">CSV</span> <span class="k">storage</span> <span class="n">engine</span>                                             <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">BLACKHOLE</span>          <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="k">null</span> <span class="k">storage</span> <span class="n">engine</span> <span class="p">(</span><span class="n">anything</span> <span class="n">you</span> <span class="k">write</span> <span class="k">to</span> <span class="n">it</span> <span class="n">disappears</span><span class="p">)</span> <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">MEMORY</span>             <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">Hash</span> <span class="n">based</span><span class="p">,</span> <span class="n">stored</span> <span class="k">in</span> <span class="n">memory</span><span class="p">,</span> <span class="n">useful</span> <span class="k">for</span> <span class="k">temporary</span> <span class="n">tables</span>      <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">FEDERATED</span>          <span class="o">|</span> <span class="k">NO</span>      <span class="o">|</span> <span class="n">Federated</span> <span class="n">MySQL</span> <span class="k">storage</span> <span class="n">engine</span>                                 <span class="o">|</span> <span class="k">NULL</span>         <span class="o">|</span> <span class="k">NULL</span> <span class="o">|</span> <span class="k">NULL</span>       <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">mroonga</span>            <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">CJK</span><span class="o">-</span><span class="n">ready</span> <span class="n">fulltext</span> <span class="k">search</span><span class="p">,</span> <span class="k">column</span> <span class="n">store</span>                        <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">MyISAM</span>             <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">MyISAM</span> <span class="k">storage</span> <span class="n">engine</span>                                          <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">PERFORMANCE_SCHEMA</span> <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">Performance</span> <span class="k">Schema</span>                                             <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">ARCHIVE</span>            <span class="o">|</span> <span class="n">YES</span>     <span class="o">|</span> <span class="n">Archive</span> <span class="k">storage</span> <span class="n">engine</span>                                         <span class="o">|</span> <span class="k">NO</span>           <span class="o">|</span> <span class="k">NO</span>   <span class="o">|</span> <span class="k">NO</span>         <span class="o">|</span>
+</span><span class='line'><span class="o">+</span><span class="c1">--------------------+---------+----------------------------------------------------------------+--------------+------+------------+</span>
+</span><span class='line'><span class="mi">10</span> <span class="k">rows</span> <span class="k">in</span> <span class="k">set</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">02</span> <span class="n">sec</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[64bit版Amazon AMIにcheckinstallをインストールする]]></title>
+    <link href="http://massat.github.io/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/"/>
+    <updated>2013-02-16T22:18:00+09:00</updated>
+    <id>http://massat.github.io/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit</id>
+    <content type="html"><![CDATA[<p>64bit環境でのcheckinstallのインストール手順をすぐ忘れるのでメモ</p>
+
+<!-- more -->
+
+
+<h1>準備</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># yum -y install git make gettext gcc rpm-build</span>
+</span><span class='line'><span class="c"># cd /usr/local/src/</span>
+</span><span class='line'><span class="c"># git clone http://checkinstall.izto.org/checkinstall.git</span>
+</span><span class='line'><span class="c"># cd checkinstall/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>64bit向けにpatchをあてる</h1>
+
+<p><a href="https://gist.github.com/massat/4967004">これらのpatch</a>をあてる</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># curl https://gist.github.com/massat/4967004/raw/0a485150b270cb9e9397d1040963a627a86436e2/Makefile.patch | patch -u Makefile</span>
+</span><span class='line'><span class="c"># curl https://gist.github.com/massat/4967004/raw/2e447f2a7519337ca8d15a80e0bad31871b39eb7/checkinstallrc-dist.patch | patch -u checkinstallrc-dist</span>
+</span><span class='line'><span class="c"># curl https://gist.github.com/massat/4967004/raw/bb87f7ee31d0758e5cec9c8d430215739428ecc1/installwatch+Makefile.patch | patch -u installwatch/Makefile</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>checkinstallをRPM化</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># mkdir -p ~/rpmbuild/SOURCES</span>
+</span><span class='line'><span class="c"># make</span>
+</span><span class='line'><span class="c"># make install</span>
+</span><span class='line'><span class="c"># checkinstall</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>いくつか質問される。パッケージを選ぶ質問には&#8221;R&#8221;(rpm)を入力。その他はReturnのみでOK。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>**********************************************************************
+</span><span class='line'>
+</span><span class='line'> Done. The new package has been saved to
+</span><span class='line'>
+</span><span class='line'> /root/rpmbuild/RPMS/x86_64/checkinstall-20130216-1.x86_64.rpm
+</span><span class='line'> You can install it in your system anytime using:
+</span><span class='line'>
+</span><span class='line'>       rpm -i checkinstall-20130216-1.x86_64.rpm
+</span><span class='line'>
+</span><span class='line'>**********************************************************************
+</span><span class='line'>
+</span><span class='line'><span class="c"># rpm -ivh /root/rpmbuild/RPMS/x86_64/checkinstall-20130216-1.x86_64.rpm</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>インストールを確認</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># rpm -qi checkinstall</span>
+</span><span class='line'>Name        : checkinstall                 Relocations: <span class="o">(</span>not relocatable<span class="o">)</span>
+</span><span class='line'>Version     : 20130216                          Vendor: <span class="o">(</span>none<span class="o">)</span>
+</span><span class='line'>Release     : 1                             Build Date: Sat 16 Feb 2013 02:13:02 PM UTC
+</span><span class='line'>Install Date: Sat 16 Feb 2013 02:18:34 PM UTC      Build Host: ip-10-152-103-196.ap-northeast-1.compute.internal
+</span><span class='line'>Group       : Applications/System           Source RPM: checkinstall-20130216-1.src.rpm
+</span><span class='line'>Size        : 453850                           License: GPL
+</span><span class='line'>Signature   : <span class="o">(</span>none<span class="o">)</span>
+</span><span class='line'>Packager    : checkinstall-1.6.3
+</span><span class='line'>Summary     : CheckInstall installations tracker, version 1.6.2
+</span><span class='line'>Description :
+</span><span class='line'>CheckInstall installations tracker, version 1.6.2
+</span><span class='line'>
+</span><span class='line'>CheckInstall  keeps  track of all the files created  or
+</span><span class='line'>modified  by your installation  script  <span class="o">(</span><span class="s2">&quot;make install&quot;</span>
+</span><span class='line'><span class="s2">&quot;make install_modules&quot;</span>,  <span class="s2">&quot;setup&quot;</span>,   etc<span class="o">)</span>,   builds    a
+</span><span class='line'>standard   binary   package and  installs  it  in  your
+</span><span class='line'>system giving you the ability to uninstall it with your
+</span><span class='line'>distribution<span class="err">&#39;</span>s  standard package management  utilities.
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mountain Lion にPHP開発環境をつくった]]></title>
+    <link href="http://massat.github.io/blog/2012/11/24/setup-php-on-mountain-lion/"/>
+    <updated>2012-11-24T23:05:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/11/24/setup-php-on-mountain-lion</id>
+    <content type="html"><![CDATA[<p>クリーンインストールしてからのPHP環境構築ログ。</p>
+
+<!-- more -->
+
+
+<h2>準備</h2>
+
+<p>ログインシェルをzshにしたりとかemacsいれたりとかいろいろやったけど、
+PHP環境に関係ある話としては</p>
+
+<ul>
+<li><a href="https://developer.apple.com/downloads/index.action">Command Line Tools for Xcode</a> をインストール</li>
+<li><a href="http://mxcl.github.com/homebrew/">Homebrew</a> をインストール</li>
+</ul>
+
+
+<p>くらい。</p>
+
+<h2>パッケージインストール</h2>
+
+<p>レポジトリ追加して</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew tap homebrew/dupes
+</span><span class='line'><span class="nv">$ </span>brew tap josegonzalez/php
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>開発で使うあたりをつらつら追加</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew install make
+</span><span class='line'><span class="nv">$ </span>brew install httpd mysql memcached mongodb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>PHP</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew install php53 --with-mysql
+</span><span class='line'><span class="nv">$ </span>brew install php53-memcache php53-mongo php53-redis
+</span><span class='line'><span class="nv">$ </span>brew install phpsh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>設定&amp;起動</h2>
+
+<p>phpの設定ファイルは <code>/usr/local/etc/php/</code> あたり、
+apacheの設定ファイルは <code>/usr/local/etc/apache2/</code> あたりにあるのでVirtualHostをよしなに設定する。</p>
+
+<p>apacheは <code>/usr/local/sbin/apachectl</code> あたり、
+mysqlは <code>/usr/local/bin/mysql.server</code> あたりで起動する。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[古いログファイルをarchiveしとくスクリプト]]></title>
+    <link href="http://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs/"/>
+    <updated>2012-11-21T11:42:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs</id>
+    <content type="html"><![CDATA[<p>書いたのではっとく</p>
+
+<div><script src='https://gist.github.com/4122658.js'></script>
+<noscript><pre><code>#!/bin/sh
+
+TODAY=`date +%Y%m%d`
+DIR=&quot;/path/to/dir&quot;
+DAYS=60
+
+find ${DIR} -type f -name &#39;*.log&#39; -daystart -mtime +${DAYS} | while read f; do
+    nice tar czfv ${f}.tgz --directory `dirname ${f}` `basename ${f}`
+    rm ${f}
+done</code></pre></noscript></div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Amazon Linux AMIにQ4Mをインストール]]></title>
+    <link href="http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/"/>
+    <updated>2012-04-08T17:57:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami</id>
+    <content type="html"><![CDATA[<p>今運用しているサービスでそろそろジョブキューが必要となりそう。
+インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
+Q4Mはソースからではなく、ビルド済のパッケージを使う。</p>
+
+<!-- more -->
+
+
+<p>EC2でmicroインスタンスたちあげて、Q4Mをインストール。
+AMIにはAmazon Linux AMIを使用した。
+このエントリ時点のAMIのバージョンは<code>amzn-ami-pv-2012.03.1.x86_64-ebs (ami-e47acbe5)</code>。</p>
+
+<h2>MySQLのインストール</h2>
+
+<p>Officialのrpmをつかってインストール。
+現在配布されている最新のビルド済Q4MはMySQL5.1.55向けのもの。
+MySQLサイトからRPMをダウンロードしてインストール。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># wget http://downloads.mysql.com/archives/mysql-5.1/MySQL-server-5.1.55-1.glibc23.x86_64.rpm</span>
+</span><span class='line'><span class="c"># wget http://downloads.mysql.com/archives/mysql-5.1/MySQL-client-5.1.55-1.glibc23.x86_64.rpm</span>
+</span><span class='line'><span class="c"># rpm -ivh MySQL-server-5.1.55-1.glibc23.x86_64.rpm</span>
+</span><span class='line'><span class="c"># rpm -ivh MySQL-client-5.1.55-1.glibc23.x86_64.rpm</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Q4Mのインストール</h2>
+
+<p>MySQLが<code>--with-fast-mutexes</code>オプションを使ってコンパイルされているかどうかで使用するQ4Mのパッケージが変わる。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># cat `which mysqlbug` | grep CONFIGURE_LINE</span>
+</span><span class='line'><span class="nv">CONFIGURE_LINE</span><span class="o">=</span><span class="s2">&quot;./configure  &#39;--with-mysqld-ldflags=-static&#39; &#39;--with-client-ldflags=-static&#39; &#39;--enable-assembler&#39; &#39;--enable-local-infile&#39; &#39;--with-fast-mutexes&#39; &#39;--with-mysqld-user=mysql&#39; &#39;--with-unix-socket-path=/var/lib/mysql/mysql.sock&#39; &#39;--with-pic&#39; &#39;--prefix=/&#39; &#39;--with-extra-charsets=complex&#39; &#39;--with-ssl&#39; &#39;--exec-prefix=/usr&#39; &#39;--libexecdir=/usr/sbin&#39; &#39;--libdir=/usr/lib64&#39; &#39;--sysconfdir=/etc&#39; &#39;--datadir=/usr/share&#39; &#39;--localstatedir=/var/lib/mysql&#39; &#39;--infodir=/usr/share/info&#39; &#39;--includedir=/usr/include&#39; &#39;--mandir=/usr/share/man&#39; &#39;--enable-thread-safe-client&#39; &#39;--with-comment=MySQL Community Server (GPL)&#39; &#39;--with-readline&#39; &#39;--with-zlib-dir=bundled&#39; &#39;--without-plugin-ndbcluster&#39; &#39;--with-plugin-innobase&#39; &#39;--without-plugin-innodb_plugin&#39; &#39;--with-plugin-partition&#39; &#39;--with-plugin-csv&#39; &#39;--with-plugin-archive&#39; &#39;--with-plugin-blackhole&#39; &#39;--with-plugin-federated&#39; &#39;--without-plugin-daemon_example&#39; &#39;--without-plugin-ftexample&#39; &#39;--with-embedded-server&#39; &#39;--with-big-tables&#39; &#39;--enable-shared&#39; &#39;CC=gcc&#39; &#39;CFLAGS=-O2 -g -pipe&#39; &#39;LDFLAGS=&#39; &#39;CXX=gcc&#39; &#39;CXXFLAGS=-O2 -g -pipe -felide-constructors -fno-exceptions -fno-rtti &#39;&quot;</span>
+</span><span class='line'><span class="sb">`</span><span class="nb">test</span> -n <span class="s2">&quot;$CONFIGURE_LINE&quot;</span>  <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;Configure command: $CONFIGURE_LINE&quot;</span><span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>コンパイルオプションに<code>--with-fast-mutexes</code>があるので、それ用のパッケージをDLしてインストールする。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># wget http://q4m.kazuhooku.com/dist/mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz</span>
+</span><span class='line'><span class="c"># tar xzf mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz</span>
+</span><span class='line'><span class="c"># cd q4m-0.9.5-linux-unknown/</span>
+</span><span class='line'><span class="c"># cp support-files/q4m-forward /usr/bin/</span>
+</span><span class='line'><span class="c"># cp libqueue_engine.so /usr/lib64/mysql/plugin/</span>
+</span><span class='line'><span class="c"># mysql &lt; support-files/install.sql</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>動作確認</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># mysql</span>
+</span><span class='line'>Welcome to the MySQL monitor.  Commands end with ; or <span class="se">\g</span>.
+</span><span class='line'>Your MySQL connection id is 3
+</span><span class='line'>Server version: 5.1.55 MySQL Community Server <span class="o">(</span>GPL<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>Copyright <span class="o">(</span>c<span class="o">)</span> 2000, 2010, Oracle and/or its affiliates. All rights reserved.
+</span><span class='line'>This software comes with ABSOLUTELY NO WARRANTY. This is free software,
+</span><span class='line'>and you are welcome to modify and redistribute it under the GPL v2 license
+</span><span class='line'>
+</span><span class='line'>Type <span class="s1">&#39;help;&#39;</span> or <span class="s1">&#39;\h&#39;</span> <span class="k">for </span>help. Type <span class="s1">&#39;\c&#39;</span> to clear the current input statement.
+</span><span class='line'>
+</span><span class='line'>mysql&gt; show engines;
+</span><span class='line'>+------------+---------+----------------------------------------------------------------+--------------+------+------------+
+</span><span class='line'>| Engine     | Support | Comment                                                        | Transactions | XA   | Savepoints |
+</span><span class='line'>+------------+---------+----------------------------------------------------------------+--------------+------+------------+
+</span><span class='line'>| InnoDB     | YES     | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+</span><span class='line'>| MRG_MYISAM | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+</span><span class='line'>| QUEUE      | YES     | Queue storage engine <span class="k">for </span>MySQL                                 | NO           | NO   | NO         |
+</span><span class='line'>| CSV        | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+</span><span class='line'>| MEMORY     | YES     | Hash based, stored in memory, useful <span class="k">for </span>temporary tables      | NO           | NO   | NO         |
+</span><span class='line'>| FEDERATED  | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+</span><span class='line'>| ARCHIVE    | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+</span><span class='line'>| BLACKHOLE  | YES     | /dev/null storage engine <span class="o">(</span>anything you write to it disappears<span class="o">)</span> | NO           | NO   | NO         |
+</span><span class='line'>| MyISAM     | DEFAULT | Default engine as of MySQL 3.23 with great performance         | NO           | NO   | NO         |
+</span><span class='line'>+------------+---------+----------------------------------------------------------------+--------------+------+------------+
+</span><span class='line'>9 rows in <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>QUEUE</code>エンジンが確認できた。</p>
+
+<h2>まとめ</h2>
+
+<p>とりあえずインストールだけ。
+worker書いたりはまた後日。Rubyで書くつもり。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[markdownからHTMLスライドをつくるgemを書いた]]></title>
+    <link href="http://massat.github.io/blog/2012/04/05/markdown-slider/"/>
+    <updated>2012-04-05T23:48:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/04/05/markdown-slider</id>
+    <content type="html"><![CDATA[<p>カンタンな文書を書くのに便利なmarkdown。
+このブログもエントリはmarkdownで書いていて、今後もドキュメントはなるべくmarkdownにしたいなと。</p>
+
+<p>んでRubyをさわってみたくて、試しにと思ってmarkdownからHTMLスライドを作るgemを書いた。</p>
+
+<!-- more -->
+
+
+<h2>markdown_slider</h2>
+
+<p><a href="https://github.com/massat/markdown_slider">markdown_slider</a></p>
+
+<p>理想は <a href="http://github.github.com/github-flavored-markdown/">GitHub Flavored Markdown</a> ちっくに書けて、そっからイケてるスライドを生成できるツール。</p>
+
+<p>なんだけど、完成度はまだまだ。</p>
+
+<p>markdownパーサーには <a href="https://github.com/tanoku/redcarpet">redcarpet</a>、生成するHTMLは<a href="http://code.google.com/p/html5slides/">html5slides</a>をちょっといじったものを使ってる。</p>
+
+<h3>インストール</h3>
+
+<p>gemコマンドでインストール。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>gem install markdown_slider
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>使いかた</h3>
+
+<p>markdownを書いて</p>
+
+<pre><code>プレゼンタイトル
+=============
+
+セクションタイトル
+---------------
+
+### スライドタイトル
+
+あいうえお
+
+### スライドタイトル
+
+``` ruby
+STDOUT.puts 'Hello, world!'
+```
+</code></pre>
+
+<p><code>md-slider</code>コマンドでスライド化</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>md-slider path/to/markdown &gt; path/to/slide.html
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>すると、JavascriptとCSSも一体になったHTMLができあがる。</p>
+
+<p>上の例のmarkdownからスライド生成をすると、<a href="http://massat.github.io/slides/markdown_slider-sample1.html">こちら</a>のようになる。
+ブログエントリをそのままスライドに！とはいかなくて、ブログエントリをそのまま <code>md-slider</code> すると<a href="http://massat.github.io/slides/markdown_slider-sample2.html">こんな感じ</a>になってしまう。
+ブログエントリそのままーの場合は、Jekyllのプラグインとかにしないとだめそう。</p>
+
+<h3>まとめ</h3>
+
+<p>そもそもはRubyが触りたかった。Perlでは苦しんだけど、Ruby結構すんなり書けた。
+できあがるスライドがちょっと使い勝手悪いので、html5slidesじゃないガワにしようかなーと思っている。
+てか、CSS/JS力が足りないだけか。そのうちガサッと変えちゃうかも。impress.jsとか？</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[StarmanとArcherで優雅にデプロイする話]]></title>
+    <link href="http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/"/>
+    <updated>2012-03-31T12:06:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer</id>
+    <content type="html"><![CDATA[<p><a href="https://github.com/miyagawa/Starman">Starman</a>に対してリモートから<a href="https://github.com/tokuhirom/Archer">Archer</a>でソースをデプロイしつつHUPを投げつけるという話。</p>
+
+<p>構成は例えば以下のような感じで、<code>admin</code>から<code>app*</code>にばらまく感じ。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[admin] --+--&gt; [app01]
+</span><span class='line'>          |
+</span><span class='line'>          +--&gt; [app02]</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<h2>Starmanの再起動</h2>
+
+<p><a href="https://github.com/miyagawa/Starman/blob/master/README">StarmanのREADME</a>によれば、</p>
+
+<blockquote><p>Supports &ldquo;HUP&rdquo; for graceful worker restarts, and &ldquo;TTIN&rdquo;/&ldquo;TTOU&rdquo; to
+dynamically increase or decrease the number of worker processes, as
+well as &ldquo;QUIT&rdquo; to gracefully shutdown the worker processes.</p></blockquote>
+
+<p>と書いてあって、HUPでGraceful Restartしてくれるとある。</p>
+
+<p>ためしに</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>% plackup -r -s Starman --pid<span class="o">=</span>/tmp/starman.pid
+</span><span class='line'>
+</span><span class='line'>2012/03/29-19:53:12 Starman::Server <span class="o">(</span><span class="nb">type </span>Net::Server::PreFork<span class="o">)</span> starting! pid<span class="o">(</span>23802<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">(</span>中略<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>Binding to TCP port 5000 on host *
+</span><span class='line'>Setting gid to <span class="s2">&quot;20 20 20 204 100 98 81 80 79 61 12 401 402&quot;</span>
+</span><span class='line'>Starman: Accepting connections at http://*:5000/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>としてStarmanを起動して別のシェルプロセスから</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>% sudo <span class="nb">kill</span> -HUP <span class="sb">`</span>cat /tmp/starman.pid<span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>とすると、Starman側に</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>Sending children hup signal during HUP on prefork server
+</span><span class='line'>2012/03/29-19:54:12 Server closing!
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と表示される。</p>
+
+<p>ちなみにStarmanはRubyの<a href="http://unicorn.bogomips.org/">Unicorn</a>ライクなものなのかなーと思っていたけど、</p>
+
+<blockquote><p>The name Starman is taken from the song (<em>Star na Otoko</em>) by the
+Japanese rock band Unicorn (yes, Unicorn!). It&rsquo;s also known as a song by
+David Bowie, a power-up from Super Mario Brothers and a character from
+Earthbound, all of which I love.</p></blockquote>
+
+<p>とあって、 &ldquo;Unicorn &ndash;> ユニコーン &ndash;> スターな男 &ndash;> Starman&rdquo; ってことかしら。</p>
+
+<h2>Archerでのデプロイ</h2>
+
+<p>Archerでリモートホストから rsync でソースを投げた後、Starman にHUPを投げたい。
+正直Archerはまだあまり使いかたがわかってない。</p>
+
+<p>設定ファイルは<a href="https://github.com/tokuhirom/Archer/blob/master/assets/kwalify/schema.yaml">ここ</a>とか<a href="https://github.com/tokuhirom/Archer/blob/master/examples/config.yaml">ここ</a>とかよく見ておこうと思う。あとソースも。</p>
+
+<p>今回は以下のような感じ。</p>
+
+<figure class='code'><figcaption><span>deploy.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">global</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">work_dir</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/work_dir</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">dest_dir</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/dest_dir</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">assets_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">assets</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">log</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">level</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">debug</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">tasks</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">init</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Confirm</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">confirm</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">msg</span><span class="p-Indicator">:</span> <span class="s">&#39;deploy</span><span class="nv"> </span><span class="s">ok?</span><span class="nv"> </span><span class="s">[y/n]&#39;</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">process</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Rsync</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">rsync</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">role</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">verbose</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">archive</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">compress</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">rsh</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ssh</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">update</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">delete</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">source</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/source</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">exclude</span><span class="p-Indicator">:</span>
+</span><span class='line'>          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">.svn/</span>
+</span><span class='line'>          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">tmp/*</span>
+</span><span class='line'>          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">log/*</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Exec::Remote</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">restart</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">role</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">command</span><span class="p-Indicator">:</span> <span class="s">&quot;-t</span><span class="nv"> </span><span class="s">&#39;sudo</span><span class="nv"> </span><span class="s">kill</span><span class="nv"> </span><span class="s">-HUP</span><span class="nv"> </span><span class="s">`cat</span><span class="nv"> </span><span class="s">/tmp/starman.pid`&#39;&quot;</span>
+</span><span class='line'><span class="l-Scalar-Plain">projects</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">example</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">app01</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">app02</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tasks.process の</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Exec::Remote</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">restart</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">role</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">command</span><span class="p-Indicator">:</span> <span class="s">&quot;-t</span><span class="nv"> </span><span class="s">&#39;sudo</span><span class="nv"> </span><span class="s">kill</span><span class="nv"> </span><span class="s">-HUP</span><span class="nv"> </span><span class="s">`cat</span><span class="nv"> </span><span class="s">/tmp/starman.pid`&#39;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で、リモートからSSHログインしてHUPを送ることをしている。
+実際には</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo -u app ssh app01 -t <span class="s1">&#39;sudo kill -HUP `cat /tmp/starman.pid`&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>って感じに展開される。
+当然app*に対しては公開鍵認証設定するなどしてパスワードなしでSSHログインできるようにしておくのと、killとcatはsudoで実行できるようにしておく必要がある。</p>
+
+<p>sshの<code>-t</code>オプションっていうのは知らなかったんだけど、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-t      Force pseudo-tty allocation.  This can be used to execute arbitrary screen-based programs on a remote machine, which can be very
+</span><span class='line'>        useful, e.g. when implementing menu services.  Multiple -t options force tty allocation, even <span class="k">if </span>ssh has no <span class="nb">local </span>tty.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>というもの。これがないと</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo: sorry, you must have a tty to run sudo
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と怒られるのを回避できる。</p>
+
+<p>これで</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>archer.pl --config<span class="o">=</span>deploy.yaml
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>って感じで実行すると、先ほどと同じようにapp*側のStarmanが再起動されるはず。</p>
+
+<h2>まとめ</h2>
+
+<p>StarmanとArcherで、デプロイからのGraceful Restartを構成した。</p>
+
+<p>実運用する場合にはStarmanをdaemontoolsとかsupervisordとかで監視したりってのも出てくると思うけど、基本的には同じ話かと思う。
+daemontoolsにはsvcってユーティリティでシグナルの送信ができるので、sudo killできる必要がなくなる。
+supervisordはsupervisorctlに<code>restart</code>ってコマンドがあるんだけど、これがHUPを送るものなのかは確認していない。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Octpresとgithub pagesでBlogをつくってみた]]></title>
+    <link href="http://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/"/>
+    <updated>2012-03-23T21:03:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages</id>
+    <content type="html"><![CDATA[<p>クールなハッカーさんたちのためのモダンなブログ環境を作ってみた。
+手順は <a href="http://octopress.org/docs/">ここ</a>の内容を順に追っていただけ。</p>
+
+<p>手元でMarkdownで書いて、</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ rake generate
+</span><span class='line'>$ rake deploy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で投稿できるなんてお手軽でいーですね。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$rake preview</span></code></pre></td></tr></table></div></figure>
+
+
+<p>でWEBrickが立ち上がってプレビューもできます。</p>
+]]></content>
+  </entry>
+  
+</feed>

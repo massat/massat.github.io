@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2014-03-28T22:33:26+09:00</updated>
+  <updated>2014-04-01T22:55:25+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ansible-motd-dq2]]></title>
+    <link href="http://massat.github.io/blog/2014/04/01/ansible-motd-dq2/"/>
+    <updated>2014-04-01T21:53:02+09:00</updated>
+    <id>http://massat.github.io/blog/2014/04/01/ansible-motd-dq2</id>
+    <content type="html"><![CDATA[<p>ansibleでsshログインしたときにドラクエのキャラクターが表示されるplaybookを書いた。</p>
+
+<p><a href="https://github.com/massat/ansible-motd-dq2">ansible-motd-dq2</a></p>
+
+<p>ネタ元は<a href="http://qiita.com/makocchi/items/5549c41526d6a6cabab1">こちら</a></p>
+
+<!--more-->
+
+
+<h2>Get started</h2>
+
+<p><code>vagrant</code>が入っていれば、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>vagrant up
+</span><span class='line'><span class="nv">$ </span>ansible-playbook playbook.yml -i vagrant_inventry
+</span><span class='line'><span class="nv">$ </span>ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で、表示が確認できる。</p>
+
+<p><img src="http://massat.github.io/images/posts/1__vagrant_vagrant-ubuntu-raring-64_____ssh_.png" alt="" /></p>
+
+<h2>表示できるキャラクター</h2>
+
+<ul>
+<li>slime</li>
+<li>slime-beth</li>
+<li>metal-slime</li>
+<li>bubble-slime</li>
+<li>hagure-metal</li>
+<li>slime-allstar</li>
+<li>dq2-lorasia</li>
+<li>dq2-samaltria</li>
+<li>dq2-moonbrooke</li>
+<li>dq2-allstar</li>
+<li>dq2-allstar_half</li>
+</ul>
+
+
+<p>キャラクターはplaybookの外部変数<code>figure</code>で指定できる。デフォルトは<code>slime</code>。</p>
+
+<p>ローレシアの王子は</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>ansible-playbook playbook.yml -i vagrant_inventry --extra-vars <span class="s2">&quot;figure=dq2-lorasia&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で表示できる。</p>
+
+<p><img src="http://massat.github.io/images/posts/2__vagrant_vagrant-ubuntu-raring-64_____ssh_.png" alt="" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ansibleの手習いをvagrantにてする]]></title>

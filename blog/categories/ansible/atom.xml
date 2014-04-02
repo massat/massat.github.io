@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ansible | massat log]]></title>
   <link href="http://massat.github.io/blog/categories/ansible/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2014-04-02T09:25:48+09:00</updated>
+  <updated>2014-04-02T10:17:29+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -25,7 +25,7 @@
 
 <p>ansibleでsshログインしたときにドラクエのキャラクターが表示されるplaybookを書いた。</p>
 
-<p><a href="https://github.com/massat/ansible-motd-dq2">ansible-motd-dq2</a></p>
+<p><a href="https://galaxy.ansible.com/list#/roles/685">ansible-motd-dq2</a></p>
 
 <p>ネタ元は<a href="http://qiita.com/makocchi/items/5549c41526d6a6cabab1">こちら</a></p>
 
@@ -34,15 +34,31 @@
 
 <h2>Get started</h2>
 
-<p><code>vagrant</code>が入っていれば、</p>
+<p>ansible-galaxy からは、</p>
+
+<p><code>sh
+$ ansible-galaxy install massat.ansible-motd-dq2
+</code></p>
+
+<p>でインストールでき、<code>massat.ansible-motd-dq2</code>のrole名で以下の感じで利用可能。</p>
+
+<p><code>yml example.yml
+- hosts: example
+  roles:
+  - { role: massat.ansible-motd-dq2, motd_dq2_figure: slime-beth }
+</code></p>
+
+<p><code>sh
+$ ansible-playbook example.yml -i path/to/your-inventry
+</code></p>
+
+<p>また、githubからcloneするとVagrantfileが同梱してるので、<code>vagrant</code>が入っていれば手元ですぐ確認ができる。</p>
 
 <p><code>sh
 $ vagrant up
 $ ansible-playbook example.yml -i example_inventry
 $ ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
 </code></p>
-
-<p>で、表示が確認できる。</p>
 
 <p><img src="/images/posts/1__vagrant_vagrant-ubuntu-raring-64_____ssh_.png" alt="" /></p>
 

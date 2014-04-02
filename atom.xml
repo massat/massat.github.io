@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2014-04-01T22:55:25+09:00</updated>
+  <updated>2014-04-02T09:25:48+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -18,7 +18,12 @@
     <link href="http://massat.github.io/blog/2014/04/01/ansible-motd-dq2/"/>
     <updated>2014-04-01T21:53:02+09:00</updated>
     <id>http://massat.github.io/blog/2014/04/01/ansible-motd-dq2</id>
-    <content type="html"><![CDATA[<p>ansibleでsshログインしたときにドラクエのキャラクターが表示されるplaybookを書いた。</p>
+    <content type="html"><![CDATA[<ul>
+<li><em>2014/4/2 ansible-galaxyの推奨する仕様に修正 commit: <a href="https://github.com/massat/ansible-motd-dq2/commit/c8058f36a1c0ab61f412e684f42cc0082760627b">c8058f3</a></em></li>
+</ul>
+
+
+<p>ansibleでsshログインしたときにドラクエのキャラクターが表示されるplaybookを書いた。</p>
 
 <p><a href="https://github.com/massat/ansible-motd-dq2">ansible-motd-dq2</a></p>
 
@@ -35,7 +40,7 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>vagrant up
-</span><span class='line'><span class="nv">$ </span>ansible-playbook playbook.yml -i vagrant_inventry
+</span><span class='line'><span class="nv">$ </span>ansible-playbook example.yml -i example_inventry
 </span><span class='line'><span class="nv">$ </span>ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
 </span></code></pre></td></tr></table></div></figure>
 
@@ -61,12 +66,12 @@
 </ul>
 
 
-<p>キャラクターはplaybookの外部変数<code>figure</code>で指定できる。デフォルトは<code>slime</code>。</p>
+<p>キャラクターはplaybookの外部変数<code>motd_dq2_figure</code>で指定できる。デフォルトは<code>slime</code>。</p>
 
 <p>ローレシアの王子は</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>ansible-playbook playbook.yml -i vagrant_inventry --extra-vars <span class="s2">&quot;figure=dq2-lorasia&quot;</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>ansible-playbook example.yml -i example_inventry --extra-vars <span class="s2">&quot;motd_dq2_figure=dq2-lorasia&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

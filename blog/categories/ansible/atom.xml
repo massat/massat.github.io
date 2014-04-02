@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ansible | massat log]]></title>
   <link href="http://massat.github.io/blog/categories/ansible/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2014-04-01T22:55:25+09:00</updated>
+  <updated>2014-04-02T09:25:48+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -18,7 +18,12 @@
     <link href="http://massat.github.io/blog/2014/04/01/ansible-motd-dq2/"/>
     <updated>2014-04-01T21:53:02+09:00</updated>
     <id>http://massat.github.io/blog/2014/04/01/ansible-motd-dq2</id>
-    <content type="html"><![CDATA[<p>ansibleでsshログインしたときにドラクエのキャラクターが表示されるplaybookを書いた。</p>
+    <content type="html"><![CDATA[<ul>
+<li><em>2014/4/2 ansible-galaxyの推奨する仕様に修正 commit: <a href="https://github.com/massat/ansible-motd-dq2/commit/c8058f36a1c0ab61f412e684f42cc0082760627b">c8058f3</a></em></li>
+</ul>
+
+
+<p>ansibleでsshログインしたときにドラクエのキャラクターが表示されるplaybookを書いた。</p>
 
 <p><a href="https://github.com/massat/ansible-motd-dq2">ansible-motd-dq2</a></p>
 
@@ -33,7 +38,7 @@
 
 <p><code>sh
 $ vagrant up
-$ ansible-playbook playbook.yml -i vagrant_inventry
+$ ansible-playbook example.yml -i example_inventry
 $ ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
 </code></p>
 
@@ -58,12 +63,12 @@ $ ssh vagrant@127.0.0.1 -p 2222 -i ~/.vagrant.d/insecure_private_key
 </ul>
 
 
-<p>キャラクターはplaybookの外部変数<code>figure</code>で指定できる。デフォルトは<code>slime</code>。</p>
+<p>キャラクターはplaybookの外部変数<code>motd_dq2_figure</code>で指定できる。デフォルトは<code>slime</code>。</p>
 
 <p>ローレシアの王子は</p>
 
 <p><code>sh
-$ ansible-playbook playbook.yml -i vagrant_inventry --extra-vars "figure=dq2-lorasia"
+$ ansible-playbook example.yml -i example_inventry --extra-vars "motd_dq2_figure=dq2-lorasia"
 </code></p>
 
 <p>で表示できる。</p>

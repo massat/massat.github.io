@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2014-07-08T23:10:05+09:00</updated>
+  <updated>2014-07-09T08:37:20+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -106,6 +106,30 @@
 自分の環境では動いてる。</p>
 
 <p>p-r 歓迎。</p>
+
+<p>(7/9追記)</p>
+
+<p>homebrew-cask で以下のも入れてる</p>
+
+<ul>
+<li>alfred</li>
+<li>coteditor</li>
+<li>evernote</li>
+<li>google-chrome</li>
+<li>google-japanese-ime</li>
+<li>hipchat</li>
+<li>hoster</li>
+<li>iterm2</li>
+<li>libreoffice</li>
+<li>mysqlworkbench</li>
+<li>skype</li>
+<li>slack</li>
+<li>sophos-anti-virus-home-edition</li>
+<li>sublime-text</li>
+<li>virtualbox</li>
+<li>yorufukurou</li>
+</ul>
+
 ]]></content>
   </entry>
   

@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>StarmanとArcherで優雅にデプロイする話 - massat log</title>
+  <meta name="author" content="Masato Hirai a.k.a. massat">
+
+  
+  <meta name="description" content="Starmanに対してリモートからArcherでソースをデプロイしつつHUPを投げつけるという話。 構成は例えば以下のような感じで、adminからapp*にばらまく感じ。 1
+2
+3
+[admin] --+--&gt; [app01] | +--&gt; [app02] Starmanの再起動 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="massat log" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1001319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">massat log</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:massat.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">StarmanとArcherで優雅にデプロイする話</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-31T12:06:00+09:00" pubdate data-updated="true">Mar 31<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="https://github.com/miyagawa/Starman">Starman</a>に対してリモートから<a href="https://github.com/tokuhirom/Archer">Archer</a>でソースをデプロイしつつHUPを投げつけるという話。</p>
+
+<p>構成は例えば以下のような感じで、<code>admin</code>から<code>app*</code>にばらまく感じ。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[admin] --+--&gt; [app01]
+</span><span class='line'>          |
+</span><span class='line'>          +--&gt; [app02]</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<h2>Starmanの再起動</h2>
+
+<p><a href="https://github.com/miyagawa/Starman/blob/master/README">StarmanのREADME</a>によれば、</p>
+
+<blockquote><p>Supports &ldquo;HUP&rdquo; for graceful worker restarts, and &ldquo;TTIN&rdquo;/&ldquo;TTOU&rdquo; to
+dynamically increase or decrease the number of worker processes, as
+well as &ldquo;QUIT&rdquo; to gracefully shutdown the worker processes.</p></blockquote>
+
+<p>と書いてあって、HUPでGraceful Restartしてくれるとある。</p>
+
+<p>ためしに</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>% plackup -r -s Starman --pid<span class="o">=</span>/tmp/starman.pid
+</span><span class='line'>
+</span><span class='line'>2012/03/29-19:53:12 Starman::Server <span class="o">(</span><span class="nb">type </span>Net::Server::PreFork<span class="o">)</span> starting! pid<span class="o">(</span>23802<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">(</span>中略<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>Binding to TCP port 5000 on host *
+</span><span class='line'>Setting gid to <span class="s2">&quot;20 20 20 204 100 98 81 80 79 61 12 401 402&quot;</span>
+</span><span class='line'>Starman: Accepting connections at http://*:5000/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>としてStarmanを起動して別のシェルプロセスから</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>% sudo <span class="nb">kill</span> -HUP <span class="sb">`</span>cat /tmp/starman.pid<span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>とすると、Starman側に</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>Sending children hup signal during HUP on prefork server
+</span><span class='line'>2012/03/29-19:54:12 Server closing!
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と表示される。</p>
+
+<p>ちなみにStarmanはRubyの<a href="http://unicorn.bogomips.org/">Unicorn</a>ライクなものなのかなーと思っていたけど、</p>
+
+<blockquote><p>The name Starman is taken from the song (<em>Star na Otoko</em>) by the
+Japanese rock band Unicorn (yes, Unicorn!). It&rsquo;s also known as a song by
+David Bowie, a power-up from Super Mario Brothers and a character from
+Earthbound, all of which I love.</p></blockquote>
+
+<p>とあって、 &ldquo;Unicorn &ndash;> ユニコーン &ndash;> スターな男 &ndash;> Starman&rdquo; ってことかしら。</p>
+
+<h2>Archerでのデプロイ</h2>
+
+<p>Archerでリモートホストから rsync でソースを投げた後、Starman にHUPを投げたい。
+正直Archerはまだあまり使いかたがわかってない。</p>
+
+<p>設定ファイルは<a href="https://github.com/tokuhirom/Archer/blob/master/assets/kwalify/schema.yaml">ここ</a>とか<a href="https://github.com/tokuhirom/Archer/blob/master/examples/config.yaml">ここ</a>とかよく見ておこうと思う。あとソースも。</p>
+
+<p>今回は以下のような感じ。</p>
+
+<figure class='code'><figcaption><span>deploy.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">global</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">work_dir</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/work_dir</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">dest_dir</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/dest_dir</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">assets_path</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">assets</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">log</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">level</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">debug</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">tasks</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">init</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Confirm</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">confirm</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">msg</span><span class="p-Indicator">:</span> <span class="s">&#39;deploy</span><span class="nv"> </span><span class="s">ok?</span><span class="nv"> </span><span class="s">[y/n]&#39;</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">process</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Rsync</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">rsync</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">role</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">verbose</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">archive</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">compress</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">rsh</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ssh</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">update</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">delete</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">source</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/path/to/source</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">exclude</span><span class="p-Indicator">:</span>
+</span><span class='line'>          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">.svn/</span>
+</span><span class='line'>          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">tmp/*</span>
+</span><span class='line'>          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">log/*</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Exec::Remote</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">restart</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">role</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>      <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">command</span><span class="p-Indicator">:</span> <span class="s">&quot;-t</span><span class="nv"> </span><span class="s">&#39;sudo</span><span class="nv"> </span><span class="s">kill</span><span class="nv"> </span><span class="s">-HUP</span><span class="nv"> </span><span class="s">`cat</span><span class="nv"> </span><span class="s">/tmp/starman.pid`&#39;&quot;</span>
+</span><span class='line'><span class="l-Scalar-Plain">projects</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">example</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">app01</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">app02</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tasks.process の</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Exec::Remote</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">restart</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">role</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">app</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">config</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">command</span><span class="p-Indicator">:</span> <span class="s">&quot;-t</span><span class="nv"> </span><span class="s">&#39;sudo</span><span class="nv"> </span><span class="s">kill</span><span class="nv"> </span><span class="s">-HUP</span><span class="nv"> </span><span class="s">`cat</span><span class="nv"> </span><span class="s">/tmp/starman.pid`&#39;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>で、リモートからSSHログインしてHUPを送ることをしている。
+実際には</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo -u app ssh app01 -t <span class="s1">&#39;sudo kill -HUP `cat /tmp/starman.pid`&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>って感じに展開される。
+当然app*に対しては公開鍵認証設定するなどしてパスワードなしでSSHログインできるようにしておくのと、killとcatはsudoで実行できるようにしておく必要がある。</p>
+
+<p>sshの<code>-t</code>オプションっていうのは知らなかったんだけど、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-t      Force pseudo-tty allocation.  This can be used to execute arbitrary screen-based programs on a remote machine, which can be very
+</span><span class='line'>        useful, e.g. when implementing menu services.  Multiple -t options force tty allocation, even <span class="k">if </span>ssh has no <span class="nb">local </span>tty.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>というもの。これがないと</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo: sorry, you must have a tty to run sudo
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と怒られるのを回避できる。</p>
+
+<p>これで</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>archer.pl --config<span class="o">=</span>deploy.yaml
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>って感じで実行すると、先ほどと同じようにapp*側のStarmanが再起動されるはず。</p>
+
+<h2>まとめ</h2>
+
+<p>StarmanとArcherで、デプロイからのGraceful Restartを構成した。</p>
+
+<p>実運用する場合にはStarmanをdaemontoolsとかsupervisordとかで監視したりってのも出てくると思うけど、基本的には同じ話かと思う。
+daemontoolsにはsvcってユーティリティでシグナルの送信ができるので、sudo killできる必要がなくなる。
+supervisordはsupervisorctlに<code>restart</code>ってコマンドがあるんだけど、これがHUPを送るものなのかは確認していない。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Masato Hirai a.k.a. massat</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-31T12:06:00+09:00" pubdate data-updated="true">Mar 31<span>st</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/deploy/'>deploy</a>, <a class='category' href='/blog/categories/perl/'>perl</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/" data-via="massat" data-counturl="http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/" title="Previous Post: Octpresとgithub pagesでBlogをつくってみた">&laquo; Octpresとgithub pagesでBlogをつくってみた</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/04/05/markdown-slider/" title="Next Post: markdownからHTMLスライドをつくるgemを書いた">markdownからHTMLスライドをつくるgemを書いた &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/08/bootstrap-my-mac/">Bootstrap-my-mac</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/01/ansible-motd-dq2/">Ansible-motd-dq2</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/27/vagrant-ansible/">Ansibleの手習いをvagrantにてする</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/">Amazon AMIにmroongaをインストールする</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/">64bit版Amazon AMIにcheckinstallをインストールする</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/massat">@massat</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'massat',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <a class="twitter-timeline" href="https://twitter.com/massat" data-widget-id="369983151939940353">@massat からのツイート</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Masato Hirai a.k.a. massat -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

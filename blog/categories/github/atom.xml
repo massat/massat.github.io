@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Github | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/github/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-07-08T23:10:05+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Octpresとgithub pagesでBlogをつくってみた]]></title>
+    <link href="http://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/"/>
+    <updated>2012-03-23T21:03:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages</id>
+    <content type="html"><![CDATA[<p>クールなハッカーさんたちのためのモダンなブログ環境を作ってみた。
+手順は <a href="http://octopress.org/docs/">ここ</a>の内容を順に追っていただけ。</p>
+
+<p>手元でMarkdownで書いて、</p>
+
+<p><code>
+$ rake generate
+$ rake deploy
+</code></p>
+
+<p>で投稿できるなんてお手軽でいーですね。</p>
+
+<p><code>
+$rake preview
+</code></p>
+
+<p>でWEBrickが立ち上がってプレビューもできます。</p>
+]]></content>
+  </entry>
+  
+</feed>

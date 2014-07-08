@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Amazon Linux AMIにQ4Mをインストール - massat log</title>
+  <meta name="author" content="Masato Hirai a.k.a. massat">
+
+  
+  <meta name="description" content="今運用しているサービスでそろそろジョブキューが必要となりそう。
+インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
+Q4Mはソースからではなく、ビルド済のパッケージを使う。 EC2でmicroインスタンスたちあげて、Q4Mをインストール。
+AMIにはAmazon Linux &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="massat log" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1001319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">massat log</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:massat.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Amazon Linux AMIにQ4Mをインストール</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-08T17:57:00+09:00" pubdate data-updated="true">Apr 8<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>今運用しているサービスでそろそろジョブキューが必要となりそう。
+インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
+Q4Mはソースからではなく、ビルド済のパッケージを使う。</p>
+
+<!-- more -->
+
+
+<p>EC2でmicroインスタンスたちあげて、Q4Mをインストール。
+AMIにはAmazon Linux AMIを使用した。
+このエントリ時点のAMIのバージョンは<code>amzn-ami-pv-2012.03.1.x86_64-ebs (ami-e47acbe5)</code>。</p>
+
+<h2>MySQLのインストール</h2>
+
+<p>Officialのrpmをつかってインストール。
+現在配布されている最新のビルド済Q4MはMySQL5.1.55向けのもの。
+MySQLサイトからRPMをダウンロードしてインストール。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># wget http://downloads.mysql.com/archives/mysql-5.1/MySQL-server-5.1.55-1.glibc23.x86_64.rpm</span>
+</span><span class='line'><span class="c"># wget http://downloads.mysql.com/archives/mysql-5.1/MySQL-client-5.1.55-1.glibc23.x86_64.rpm</span>
+</span><span class='line'><span class="c"># rpm -ivh MySQL-server-5.1.55-1.glibc23.x86_64.rpm</span>
+</span><span class='line'><span class="c"># rpm -ivh MySQL-client-5.1.55-1.glibc23.x86_64.rpm</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Q4Mのインストール</h2>
+
+<p>MySQLが<code>--with-fast-mutexes</code>オプションを使ってコンパイルされているかどうかで使用するQ4Mのパッケージが変わる。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># cat `which mysqlbug` | grep CONFIGURE_LINE</span>
+</span><span class='line'><span class="nv">CONFIGURE_LINE</span><span class="o">=</span><span class="s2">&quot;./configure  &#39;--with-mysqld-ldflags=-static&#39; &#39;--with-client-ldflags=-static&#39; &#39;--enable-assembler&#39; &#39;--enable-local-infile&#39; &#39;--with-fast-mutexes&#39; &#39;--with-mysqld-user=mysql&#39; &#39;--with-unix-socket-path=/var/lib/mysql/mysql.sock&#39; &#39;--with-pic&#39; &#39;--prefix=/&#39; &#39;--with-extra-charsets=complex&#39; &#39;--with-ssl&#39; &#39;--exec-prefix=/usr&#39; &#39;--libexecdir=/usr/sbin&#39; &#39;--libdir=/usr/lib64&#39; &#39;--sysconfdir=/etc&#39; &#39;--datadir=/usr/share&#39; &#39;--localstatedir=/var/lib/mysql&#39; &#39;--infodir=/usr/share/info&#39; &#39;--includedir=/usr/include&#39; &#39;--mandir=/usr/share/man&#39; &#39;--enable-thread-safe-client&#39; &#39;--with-comment=MySQL Community Server (GPL)&#39; &#39;--with-readline&#39; &#39;--with-zlib-dir=bundled&#39; &#39;--without-plugin-ndbcluster&#39; &#39;--with-plugin-innobase&#39; &#39;--without-plugin-innodb_plugin&#39; &#39;--with-plugin-partition&#39; &#39;--with-plugin-csv&#39; &#39;--with-plugin-archive&#39; &#39;--with-plugin-blackhole&#39; &#39;--with-plugin-federated&#39; &#39;--without-plugin-daemon_example&#39; &#39;--without-plugin-ftexample&#39; &#39;--with-embedded-server&#39; &#39;--with-big-tables&#39; &#39;--enable-shared&#39; &#39;CC=gcc&#39; &#39;CFLAGS=-O2 -g -pipe&#39; &#39;LDFLAGS=&#39; &#39;CXX=gcc&#39; &#39;CXXFLAGS=-O2 -g -pipe -felide-constructors -fno-exceptions -fno-rtti &#39;&quot;</span>
+</span><span class='line'><span class="sb">`</span><span class="nb">test</span> -n <span class="s2">&quot;$CONFIGURE_LINE&quot;</span>  <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;Configure command: $CONFIGURE_LINE&quot;</span><span class="sb">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>コンパイルオプションに<code>--with-fast-mutexes</code>があるので、それ用のパッケージをDLしてインストールする。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># wget http://q4m.kazuhooku.com/dist/mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz</span>
+</span><span class='line'><span class="c"># tar xzf mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz</span>
+</span><span class='line'><span class="c"># cd q4m-0.9.5-linux-unknown/</span>
+</span><span class='line'><span class="c"># cp support-files/q4m-forward /usr/bin/</span>
+</span><span class='line'><span class="c"># cp libqueue_engine.so /usr/lib64/mysql/plugin/</span>
+</span><span class='line'><span class="c"># mysql &lt; support-files/install.sql</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>動作確認</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># mysql</span>
+</span><span class='line'>Welcome to the MySQL monitor.  Commands end with ; or <span class="se">\g</span>.
+</span><span class='line'>Your MySQL connection id is 3
+</span><span class='line'>Server version: 5.1.55 MySQL Community Server <span class="o">(</span>GPL<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>Copyright <span class="o">(</span>c<span class="o">)</span> 2000, 2010, Oracle and/or its affiliates. All rights reserved.
+</span><span class='line'>This software comes with ABSOLUTELY NO WARRANTY. This is free software,
+</span><span class='line'>and you are welcome to modify and redistribute it under the GPL v2 license
+</span><span class='line'>
+</span><span class='line'>Type <span class="s1">&#39;help;&#39;</span> or <span class="s1">&#39;\h&#39;</span> <span class="k">for </span>help. Type <span class="s1">&#39;\c&#39;</span> to clear the current input statement.
+</span><span class='line'>
+</span><span class='line'>mysql&gt; show engines;
+</span><span class='line'>+------------+---------+----------------------------------------------------------------+--------------+------+------------+
+</span><span class='line'>| Engine     | Support | Comment                                                        | Transactions | XA   | Savepoints |
+</span><span class='line'>+------------+---------+----------------------------------------------------------------+--------------+------+------------+
+</span><span class='line'>| InnoDB     | YES     | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+</span><span class='line'>| MRG_MYISAM | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+</span><span class='line'>| QUEUE      | YES     | Queue storage engine <span class="k">for </span>MySQL                                 | NO           | NO   | NO         |
+</span><span class='line'>| CSV        | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+</span><span class='line'>| MEMORY     | YES     | Hash based, stored in memory, useful <span class="k">for </span>temporary tables      | NO           | NO   | NO         |
+</span><span class='line'>| FEDERATED  | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+</span><span class='line'>| ARCHIVE    | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+</span><span class='line'>| BLACKHOLE  | YES     | /dev/null storage engine <span class="o">(</span>anything you write to it disappears<span class="o">)</span> | NO           | NO   | NO         |
+</span><span class='line'>| MyISAM     | DEFAULT | Default engine as of MySQL 3.23 with great performance         | NO           | NO   | NO         |
+</span><span class='line'>+------------+---------+----------------------------------------------------------------+--------------+------+------------+
+</span><span class='line'>9 rows in <span class="nb">set</span> <span class="o">(</span>0.00 sec<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>QUEUE</code>エンジンが確認できた。</p>
+
+<h2>まとめ</h2>
+
+<p>とりあえずインストールだけ。
+worker書いたりはまた後日。Rubyで書くつもり。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Masato Hirai a.k.a. massat</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-08T17:57:00+09:00" pubdate data-updated="true">Apr 8<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/aws/'>aws</a>, <a class='category' href='/blog/categories/mysql/'>mysql</a>, <a class='category' href='/blog/categories/q4m/'>q4m</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/" data-via="massat" data-counturl="http://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/05/markdown-slider/" title="Previous Post: markdownからHTMLスライドをつくるgemを書いた">&laquo; markdownからHTMLスライドをつくるgemを書いた</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/11/21/a-script-compressing-old-logs/" title="Next Post: 古いログファイルをarchiveしとくスクリプト">古いログファイルをarchiveしとくスクリプト &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/08/bootstrap-my-mac/">Bootstrap-my-mac</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/01/ansible-motd-dq2/">Ansible-motd-dq2</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/27/vagrant-ansible/">Ansibleの手習いをvagrantにてする</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/">Amazon AMIにmroongaをインストールする</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/">64bit版Amazon AMIにcheckinstallをインストールする</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/massat">@massat</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'massat',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <a class="twitter-timeline" href="https://twitter.com/massat" data-widget-id="369983151939940353">@massat からのツイート</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Masato Hirai a.k.a. massat -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

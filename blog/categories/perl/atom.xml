@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Perl | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/perl/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2014-07-08T23:10:05+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[StarmanとArcherで優雅にデプロイする話]]></title>
+    <link href="http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/"/>
+    <updated>2012-03-31T12:06:00+09:00</updated>
+    <id>http://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer</id>
+    <content type="html"><![CDATA[<p><a href="https://github.com/miyagawa/Starman">Starman</a>に対してリモートから<a href="https://github.com/tokuhirom/Archer">Archer</a>でソースをデプロイしつつHUPを投げつけるという話。</p>
+
+<p>構成は例えば以下のような感じで、<code>admin</code>から<code>app*</code>にばらまく感じ。</p>
+
+<p>```
+[admin] &mdash;+&mdash;> [app01]</p>
+
+<pre><code>      |
+      +--&gt; [app02]
+</code></pre>
+
+<p>```</p>
+
+<!-- more -->
+
+
+<h2>Starmanの再起動</h2>
+
+<p><a href="https://github.com/miyagawa/Starman/blob/master/README">StarmanのREADME</a>によれば、</p>
+
+<blockquote><p>Supports &ldquo;HUP&rdquo; for graceful worker restarts, and &ldquo;TTIN&rdquo;/&ldquo;TTOU&rdquo; to
+dynamically increase or decrease the number of worker processes, as
+well as &ldquo;QUIT&rdquo; to gracefully shutdown the worker processes.</p></blockquote>
+
+<p>と書いてあって、HUPでGraceful Restartしてくれるとある。</p>
+
+<p>ためしに</p>
+
+<p>```sh
+% plackup -r -s Starman &mdash;pid=/tmp/starman.pid</p>
+
+<p>2012/03/29-19:53:12 Starman::Server (type Net::Server::PreFork) starting! pid(23802)</p>
+
+<p>(中略)</p>
+
+<p>Binding to TCP port 5000 on host *
+Setting gid to &ldquo;20 20 20 204 100 98 81 80 79 61 12 401 402&rdquo;
+Starman: Accepting connections at <a href="http://*:5000/">http://*:5000/</a>
+```</p>
+
+<p>としてStarmanを起動して別のシェルプロセスから</p>
+
+<p><code>sh
+% sudo kill -HUP `cat /tmp/starman.pid`
+</code></p>
+
+<p>とすると、Starman側に</p>
+
+<p><code>sh
+Sending children hup signal during HUP on prefork server
+2012/03/29-19:54:12 Server closing!
+</code></p>
+
+<p>と表示される。</p>
+
+<p>ちなみにStarmanはRubyの<a href="http://unicorn.bogomips.org/">Unicorn</a>ライクなものなのかなーと思っていたけど、</p>
+
+<blockquote><p>The name Starman is taken from the song (<em>Star na Otoko</em>) by the
+Japanese rock band Unicorn (yes, Unicorn!). It&rsquo;s also known as a song by
+David Bowie, a power-up from Super Mario Brothers and a character from
+Earthbound, all of which I love.</p></blockquote>
+
+<p>とあって、 &ldquo;Unicorn &ndash;> ユニコーン &ndash;> スターな男 &ndash;> Starman&rdquo; ってことかしら。</p>
+
+<h2>Archerでのデプロイ</h2>
+
+<p>Archerでリモートホストから rsync でソースを投げた後、Starman にHUPを投げたい。
+正直Archerはまだあまり使いかたがわかってない。</p>
+
+<p>設定ファイルは<a href="https://github.com/tokuhirom/Archer/blob/master/assets/kwalify/schema.yaml">ここ</a>とか<a href="https://github.com/tokuhirom/Archer/blob/master/examples/config.yaml">ここ</a>とかよく見ておこうと思う。あとソースも。</p>
+
+<p>今回は以下のような感じ。</p>
+
+<p>```yml deploy.yml
+global:
+  work_dir: /path/to/work_dir
+  dest_dir: /path/to/dest_dir
+  assets_path: assets
+  log:</p>
+
+<pre><code>level: debug
+</code></pre>
+
+<p>tasks:
+  init:</p>
+
+<pre><code>- module: Confirm
+  name: confirm
+  config:
+    msg: 'deploy ok? [y/n]'
+</code></pre>
+
+<p>  process:</p>
+
+<pre><code>- module: Rsync
+  name: rsync
+  role: app
+  config:
+    user: app
+    verbose: 1
+    archive: 1
+    compress: 1
+    rsh: ssh
+    update: 0
+    delete: 1
+    source: /path/to/source
+    exclude:
+      - .svn/
+      - tmp/*
+      - log/*
+- module: Exec::Remote
+  name: restart
+  role: app
+  config:
+    command: "-t 'sudo kill -HUP `cat /tmp/starman.pid`'"
+</code></pre>
+
+<p>projects:
+  example:</p>
+
+<pre><code>app:
+  - app01
+  - app02
+</code></pre>
+
+<p>```</p>
+
+<p>tasks.process の</p>
+
+<p>```yml</p>
+
+<pre><code>- module: Exec::Remote
+  name: restart
+  role: app
+  config:
+    command: "-t 'sudo kill -HUP `cat /tmp/starman.pid`'"
+</code></pre>
+
+<p>```</p>
+
+<p>で、リモートからSSHログインしてHUPを送ることをしている。
+実際には</p>
+
+<p><code>sh
+sudo -u app ssh app01 -t 'sudo kill -HUP `cat /tmp/starman.pid`'
+</code></p>
+
+<p>って感じに展開される。
+当然app*に対しては公開鍵認証設定するなどしてパスワードなしでSSHログインできるようにしておくのと、killとcatはsudoで実行できるようにしておく必要がある。</p>
+
+<p>sshの<code>-t</code>オプションっていうのは知らなかったんだけど、</p>
+
+<p>```
+-t      Force pseudo-tty allocation.  This can be used to execute arbitrary screen-based programs on a remote machine, which can be very</p>
+
+<pre><code>    useful, e.g. when implementing menu services.  Multiple -t options force tty allocation, even if ssh has no local tty.
+</code></pre>
+
+<p>```</p>
+
+<p>というもの。これがないと</p>
+
+<p><code>sh
+sudo: sorry, you must have a tty to run sudo
+</code></p>
+
+<p>と怒られるのを回避できる。</p>
+
+<p>これで</p>
+
+<p><code>sh
+archer.pl --config=deploy.yaml
+</code></p>
+
+<p>って感じで実行すると、先ほどと同じようにapp*側のStarmanが再起動されるはず。</p>
+
+<h2>まとめ</h2>
+
+<p>StarmanとArcherで、デプロイからのGraceful Restartを構成した。</p>
+
+<p>実運用する場合にはStarmanをdaemontoolsとかsupervisordとかで監視したりってのも出てくると思うけど、基本的には同じ話かと思う。
+daemontoolsにはsvcってユーティリティでシグナルの送信ができるので、sudo killできる必要がなくなる。
+supervisordはsupervisorctlに<code>restart</code>ってコマンドがあるんだけど、これがHUPを送るものなのかは確認していない。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -9,12 +9,10 @@
   <meta name="author" content="Masato Hirai a.k.a. massat">
 
   
-  <meta name="description" content="クールなハッカーさんたちのためのモダンなブログ環境を作ってみた。
-手順は ここの内容を順に追っていただけ。 手元でMarkdownで書いて、 1
+  <meta name="description" content="Starmanに対してリモートからArcherでソースをデプロイしつつHUPを投げつけるという話。 構成は例えば以下のような感じで、adminからapp*にばらまく感じ。 1
 2
-$ rake generate
-$ rake deploy で投稿できるなんてお手軽でいーですね。 1
-$rake preview &hellip;">
+3
+[admin] --+--&gt; [app01] | +--&gt; [app02] ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +84,59 @@ $rake preview &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/03/31/graceful-deployment-with-starman-and-archer/">StarmanとArcherで優雅にデプロイする話</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-31T12:06:00+09:00" pubdate data-updated="true">Mar 31<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://github.com/miyagawa/Starman">Starman</a>に対してリモートから<a href="https://github.com/tokuhirom/Archer">Archer</a>でソースをデプロイしつつHUPを投げつけるという話。</p>
+
+<p>構成は例えば以下のような感じで、<code>admin</code>から<code>app*</code>にばらまく感じ。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[admin] --+--&gt; [app01]
+</span><span class='line'>          |
+</span><span class='line'>          +--&gt; [app02]</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/31/graceful-deployment-with-starman-and-archer/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/">Octpresとgithub pagesでBlogをつくってみた</a></h1>
     
     
@@ -149,6 +200,10 @@ $rake preview &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/03/03/kamakurago-vol1/">kamakura.go #1 を開催しました。</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/07/08/bootstrap-my-mac/">Bootstrap-my-mac</a>
       </li>
     
@@ -162,10 +217,6 @@ $rake preview &hellip;">
     
       <li class="post">
         <a href="/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/">Amazon AMIにmroongaをインストールする</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/">64bit版Amazon AMIにcheckinstallをインストールする</a>
       </li>
     
   </ul>
@@ -217,7 +268,7 @@ $rake preview &hellip;">
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Masato Hirai a.k.a. massat -
+  Copyright &copy; 2015 - Masato Hirai a.k.a. massat -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

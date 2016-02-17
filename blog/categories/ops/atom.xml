@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ops | massat log]]></title>
   <link href="http://massat.github.io/blog/categories/ops/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2015-03-03T01:10:48+09:00</updated>
+  <updated>2016-02-17T10:46:05+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -27,7 +27,7 @@ TODAY=`date +%Y%m%d`
 DIR=&quot;/path/to/dir&quot;
 DAYS=60
 
-find ${DIR} -type f -name '*.log' -daystart -mtime +${DAYS} | while read f; do
+find ${DIR} -type f -name &#39;*.log&#39; -daystart -mtime +${DAYS} | while read f; do
     nice tar czfv ${f}.tgz --directory `dirname ${f}` `basename ${f}`
     rm ${f}
 done</code></pre></noscript></div>

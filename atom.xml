@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2015-03-03T01:10:48+09:00</updated>
+  <updated>2016-02-17T10:46:05+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,182 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vim入門#1]]></title>
+    <link href="http://massat.github.io/blog/2016/02/17/vim-number-1/"/>
+    <updated>2016-02-17T09:48:51+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/17/vim-number-1</id>
+    <content type="html"><![CDATA[<p>Vimを勉強してみる。
+これまで、サーバー上のファイルを編集するためなどに素のVimを使っていたりはしたが、アプリケーションのコードを書くためのツールとしてみることにする。</p>
+
+<p>ちなみにアプリケーションを書くためのエディタの遍歴としては</p>
+
+<ul>
+<li>新卒で入った会社でJavaを<code>eclipse</code>で書く</li>
+<li>PHPを各会社を作る。PHPを<code>eclipse+PDT</code>で書く</li>
+<li>Perlを書くために<code>emacs</code>を使い始める</li>
+<li>面倒見るのが面倒になって<code>SublimeText</code>に乗り換え</li>
+</ul>
+
+
+<p>と言った感じ。</p>
+
+<h2>なぜVimを始めるのか</h2>
+
+<p>これまで、Mac上でコードを書いていたのだけど、
+リモートのコードを触ることが増えていきそうだから。</p>
+
+<h2>なぜEmacsじゃないのか</h2>
+
+<p>気分。</p>
+
+<h2>目標とか</h2>
+
+<p>まずは、Macの上でVimを使いこなせるようになる。
+ただ、リモートでの作業もできるようにすることが趣旨の一つではあるので、その辺のポータビリティも考えないといけない。</p>
+
+<ul>
+<li><code>.vim</code>を持っていく+α</li>
+</ul>
+
+
+<p>くらいで環境を再現できるくらいに止めないといけない。</p>
+
+<h2>1日目にやったこと</h2>
+
+<h3>Vimのインストール</h3>
+
+<p>素で入ってるVimよりもバージョンが進んでるようだったのでHomebrewのVimを入れる。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>➜  ~  vim --version
+</span><span class='line'>VIM - Vi IMproved 7.3 (2010 Aug 15, compiled Oct 27 2015 16:22:14)</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>➜  ~  brew info vim
+</span><span class='line'>vim: stable 7.4.1301, HEAD
+</span><span class='line'>Vi "workalike" with many additional features
+</span><span class='line'>http://www.vim.org/
+</span><span class='line'>Conflicts with: ex-vi
+</span><span class='line'>/usr/local/Cellar/vim/7.4.1301 (1,623 files, 24.8M) *
+</span><span class='line'>  Built from source with: --override-system-vi --with-lua --with-luajit
+</span><span class='line'>From: https://github.com/Homebrew/homebrew/blob/master/Library/Formula/vim.rb
+</span><span class='line'>==&gt; Dependencies
+</span><span class='line'>Optional: lua ✘, luajit ✘
+</span><span class='line'>==&gt; Options
+</span><span class='line'>--disable-nls
+</span><span class='line'>  Build vim without National Language Support (translated messages, keymaps)
+</span><span class='line'>--override-system-vi
+</span><span class='line'>  Override system vi
+</span><span class='line'>--with-client-server
+</span><span class='line'>  Enable client/server mode
+</span><span class='line'>--with-lua
+</span><span class='line'>  Build vim with lua support
+</span><span class='line'>--with-luajit
+</span><span class='line'>  Build with luajit support
+</span><span class='line'>--with-mzscheme
+</span><span class='line'>  Build vim with mzscheme support
+</span><span class='line'>--with-python3
+</span><span class='line'>  Build vim with python3 instead of python[2] support
+</span><span class='line'>--with-tcl
+</span><span class='line'>  Build vim with tcl support
+</span><span class='line'>--without-perl
+</span><span class='line'>  Build vim without perl support
+</span><span class='line'>--without-python
+</span><span class='line'>  Build vim without python support
+</span><span class='line'>--without-ruby
+</span><span class='line'>  Build vim without ruby support
+</span><span class='line'>--HEAD
+</span><span class='line'>  Install HEAD version</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>システムのviを置き換えること</li>
+<li>仕入れた情報によれば、NeoCompleteを使うのであれluaが必要</li>
+</ul>
+
+
+<p>ということだったので</p>
+
+<ul>
+<li><code>--override-system-vi</code></li>
+<li><code>--with-lua</code></li>
+<li><code>--with-luajit</code></li>
+</ul>
+
+
+<p>を使って<a href="https://github.com/massat/bootstrap/commit/b95900d50a51bcd441487acd8f249a5e5f111283">インストールするようにした</a>。</p>
+
+<h3>vimtutor をやった</h3>
+
+<p>いろいろ学びがありました。</p>
+
+<ul>
+<li><code>0</code> で行頭移動</li>
+<li><code>$</code> で行末移動</li>
+</ul>
+
+
+<p>知らなかった。</p>
+
+<h3>本をポチった</h3>
+
+<iframe src="http://rcm-fe.amazon-adsystem.com/e/cm?t=genteitimesne-22&o=9&p=8&l=as1&asins=4048916599&ref=qf_sp_asin_til&fc1=000000&IS2=1&lt1=_blank&m=amazon&lc1=0000FF&bc1=000000&bg1=FFFFFF&f=ifr" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+
+
+<h3>社内Slackに #vim チャネルを作った</h3>
+
+<p>社内にVimmerがいます。</p>
+
+<h2>TODO</h2>
+
+<ul>
+<li>かっちょいいテーマにしたい</li>
+<li>ファイル名のいい感じの検索ができるようにしたい</li>
+<li>アプリケーションコードのいい感じの補完、シンボルへのジャンプなどができるようにしたい</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[kamakura.go #1 を開催しました。]]></title>
@@ -952,7 +1128,7 @@ TODAY=`date +%Y%m%d`
 DIR=&quot;/path/to/dir&quot;
 DAYS=60
 
-find ${DIR} -type f -name '*.log' -daystart -mtime +${DAYS} | while read f; do
+find ${DIR} -type f -name &#39;*.log&#39; -daystart -mtime +${DAYS} | while read f; do
     nice tar czfv ${f}.tgz --directory `dirname ${f}` `basename ${f}`
     rm ${f}
 done</code></pre></noscript></div>

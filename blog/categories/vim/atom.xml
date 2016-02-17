@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Vim | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/vim/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2016-02-17T10:46:05+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Vim入門#1]]></title>
+    <link href="http://massat.github.io/blog/2016/02/17/vim-number-1/"/>
+    <updated>2016-02-17T09:48:51+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/17/vim-number-1</id>
+    <content type="html"><![CDATA[<p>Vimを勉強してみる。
+これまで、サーバー上のファイルを編集するためなどに素のVimを使っていたりはしたが、アプリケーションのコードを書くためのツールとしてみることにする。</p>
+
+<p>ちなみにアプリケーションを書くためのエディタの遍歴としては</p>
+
+<ul>
+<li>新卒で入った会社でJavaを<code>eclipse</code>で書く</li>
+<li>PHPを各会社を作る。PHPを<code>eclipse+PDT</code>で書く</li>
+<li>Perlを書くために<code>emacs</code>を使い始める</li>
+<li>面倒見るのが面倒になって<code>SublimeText</code>に乗り換え</li>
+</ul>
+
+
+<p>と言った感じ。</p>
+
+<h2>なぜVimを始めるのか</h2>
+
+<p>これまで、Mac上でコードを書いていたのだけど、
+リモートのコードを触ることが増えていきそうだから。</p>
+
+<h2>なぜEmacsじゃないのか</h2>
+
+<p>気分。</p>
+
+<h2>目標とか</h2>
+
+<p>まずは、Macの上でVimを使いこなせるようになる。
+ただ、リモートでの作業もできるようにすることが趣旨の一つではあるので、その辺のポータビリティも考えないといけない。</p>
+
+<ul>
+<li><code>.vim</code>を持っていく+α</li>
+</ul>
+
+
+<p>くらいで環境を再現できるくらいに止めないといけない。</p>
+
+<h2>1日目にやったこと</h2>
+
+<h3>Vimのインストール</h3>
+
+<p>素で入ってるVimよりもバージョンが進んでるようだったのでHomebrewのVimを入れる。</p>
+
+<p><code>
+➜  ~  vim --version
+VIM - Vi IMproved 7.3 (2010 Aug 15, compiled Oct 27 2015 16:22:14)
+</code></p>
+
+<p>```
+➜  ~  brew info vim
+vim: stable 7.4.1301, HEAD
+Vi &ldquo;workalike&rdquo; with many additional features
+<a href="http://www.vim.org/">http://www.vim.org/</a>
+Conflicts with: ex-vi
+/usr/local/Cellar/vim/7.4.1301 (1,623 files, 24.8M) *
+  Built from source with: &mdash;override-system-vi &mdash;with-lua &mdash;with-luajit
+From: <a href="https://github.com/Homebrew/homebrew/blob/master/Library/Formula/vim.rb">https://github.com/Homebrew/homebrew/blob/master/Library/Formula/vim.rb</a>
+==> Dependencies
+Optional: lua ✘, luajit ✘
+==> Options
+&mdash;disable-nls</p>
+
+<pre><code>Build vim without National Language Support (translated messages, keymaps)
+</code></pre>
+
+<p>&mdash;override-system-vi</p>
+
+<pre><code>Override system vi
+</code></pre>
+
+<p>&mdash;with-client-server</p>
+
+<pre><code>Enable client/server mode
+</code></pre>
+
+<p>&mdash;with-lua</p>
+
+<pre><code>Build vim with lua support
+</code></pre>
+
+<p>&mdash;with-luajit</p>
+
+<pre><code>Build with luajit support
+</code></pre>
+
+<p>&mdash;with-mzscheme</p>
+
+<pre><code>Build vim with mzscheme support
+</code></pre>
+
+<p>&mdash;with-python3</p>
+
+<pre><code>Build vim with python3 instead of python[2] support
+</code></pre>
+
+<p>&mdash;with-tcl</p>
+
+<pre><code>Build vim with tcl support
+</code></pre>
+
+<p>&mdash;without-perl</p>
+
+<pre><code>Build vim without perl support
+</code></pre>
+
+<p>&mdash;without-python</p>
+
+<pre><code>Build vim without python support
+</code></pre>
+
+<p>&mdash;without-ruby</p>
+
+<pre><code>Build vim without ruby support
+</code></pre>
+
+<p>&mdash;HEAD</p>
+
+<pre><code>Install HEAD version
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>システムのviを置き換えること</li>
+<li>仕入れた情報によれば、NeoCompleteを使うのであれluaが必要</li>
+</ul>
+
+
+<p>ということだったので</p>
+
+<ul>
+<li><code>--override-system-vi</code></li>
+<li><code>--with-lua</code></li>
+<li><code>--with-luajit</code></li>
+</ul>
+
+
+<p>を使って<a href="https://github.com/massat/bootstrap/commit/b95900d50a51bcd441487acd8f249a5e5f111283">インストールするようにした</a>。</p>
+
+<h3>vimtutor をやった</h3>
+
+<p>いろいろ学びがありました。</p>
+
+<ul>
+<li><code>0</code> で行頭移動</li>
+<li><code>$</code> で行末移動</li>
+</ul>
+
+
+<p>知らなかった。</p>
+
+<h3>本をポチった</h3>
+
+<iframe src="http://rcm-fe.amazon-adsystem.com/e/cm?t=genteitimesne-22&o=9&p=8&l=as1&asins=4048916599&ref=qf_sp_asin_til&fc1=000000&IS2=1&lt1=_blank&m=amazon&lc1=0000FF&bc1=000000&bg1=FFFFFF&f=ifr" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+
+
+<h3>社内Slackに #vim チャネルを作った</h3>
+
+<p>社内にVimmerがいます。</p>
+
+<h2>TODO</h2>
+
+<ul>
+<li>かっちょいいテーマにしたい</li>
+<li>ファイル名のいい感じの検索ができるようにしたい</li>
+<li>アプリケーションコードのいい感じの補完、シンボルへのジャンプなどができるようにしたい</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

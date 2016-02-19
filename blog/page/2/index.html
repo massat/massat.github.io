@@ -9,9 +9,9 @@
   <meta name="author" content="Masato Hirai a.k.a. massat">
 
   
-  <meta name="description" content="今運用しているサービスでそろそろジョブキューが必要となりそう。
-インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
-Q4Mはソースからではなく、ビルド済のパッケージを使う。 ">
+  <meta name="description" content="書いたのではっとく #!/bin/sh TODAY=`date +%Y%m%d`
+DIR=&quot;/path/to/dir&quot;
+DAYS=60 find ${DIR} -type f -name &#39;*.log&#39; -daystart -mtime +${DAYS} | &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,57 @@ Q4Mはソースからではなく、ビルド済のパッケージを使う。 "
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/21/a-script-compressing-old-logs/">古いログファイルをarchiveしとくスクリプト</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-21T11:42:00+09:00" pubdate data-updated="true">Nov 21<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>書いたのではっとく</p>
+
+<div><script src='https://gist.github.com/4122658.js'></script>
+<noscript><pre><code>#!/bin/sh
+
+TODAY=`date +%Y%m%d`
+DIR=&quot;/path/to/dir&quot;
+DAYS=60
+
+find ${DIR} -type f -name &#39;*.log&#39; -daystart -mtime +${DAYS} | while read f; do
+    nice tar czfv ${f}.tgz --directory `dirname ${f}` `basename ${f}`
+    rm ${f}
+done</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -286,6 +337,10 @@ Q4Mはソースからではなく、ビルド済のパッケージを使う。</
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">MySQLでテーブルが使用している容量を確認するSQL</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/">bzip2したSQLからリストアするコマンド</a>
       </li>
     
@@ -299,10 +354,6 @@ Q4Mはソースからではなく、ビルド済のパッケージを使う。</
     
       <li class="post">
         <a href="/blog/2014/07/08/bootstrap-my-mac/">Bootstrap-my-mac</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/04/01/ansible-motd-dq2/">Ansible-motd-dq2</a>
       </li>
     
   </ul>

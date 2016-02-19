@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-02-19T18:19:56+09:00</updated>
+  <updated>2016-02-19T18:24:22+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,52 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[MySQLでテーブルが使用している容量を確認するSQL]]></title>
+    <link href="http://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/"/>
+    <updated>2016-02-19T18:22:49+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql</id>
+    <content type="html"><![CDATA[<p><a href="http://d.hatena.ne.jp/sho-yamasaki/20120405/1333640589">データベースとテーブルのサイズを確認する方法 &ndash; ふってもハレても</a> より。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">use</span> <span class="n">databaseName</span><span class="p">;</span>
+</span><span class='line'><span class="k">select</span>
+</span><span class='line'><span class="k">table_name</span><span class="p">,</span> <span class="n">engine</span><span class="p">,</span> <span class="n">table_rows</span> <span class="k">as</span> <span class="n">tbl_rows</span><span class="p">,</span> <span class="n">avg_row_length</span> <span class="k">as</span> <span class="n">rlen</span><span class="p">,</span>
+</span><span class='line'><span class="n">floor</span><span class="p">((</span><span class="n">data_length</span><span class="o">+</span><span class="n">index_length</span><span class="p">)</span><span class="o">/</span><span class="mi">1024</span><span class="o">/</span><span class="mi">1024</span><span class="p">)</span> <span class="k">as</span> <span class="n">allMB</span><span class="p">,</span>  <span class="o">#</span><span class="err">総容量</span>
+</span><span class='line'><span class="n">floor</span><span class="p">((</span><span class="n">data_length</span><span class="p">)</span><span class="o">/</span><span class="mi">1024</span><span class="o">/</span><span class="mi">1024</span><span class="p">)</span> <span class="k">as</span> <span class="n">dMB</span><span class="p">,</span>  <span class="o">#</span><span class="err">データ容量</span>
+</span><span class='line'><span class="n">floor</span><span class="p">((</span><span class="n">index_length</span><span class="p">)</span><span class="o">/</span><span class="mi">1024</span><span class="o">/</span><span class="mi">1024</span><span class="p">)</span> <span class="k">as</span> <span class="n">iMB</span>   <span class="o">#</span><span class="err">インデックス容量</span>
+</span><span class='line'><span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
+</span><span class='line'><span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()</span>
+</span><span class='line'><span class="k">order</span> <span class="k">by</span> <span class="p">(</span><span class="n">data_length</span><span class="o">+</span><span class="n">index_length</span><span class="p">)</span> <span class="k">desc</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">+</span><span class="c1">------------------------------+--------+----------+------+-------+------+------+</span>
+</span><span class='line'><span class="o">|</span> <span class="k">table_name</span>                <span class="o">|</span> <span class="n">engine</span>     <span class="o">|</span> <span class="n">tbl_rows</span>  <span class="o">|</span> <span class="n">rlen</span> <span class="o">|</span> <span class="n">allMB</span> <span class="o">|</span> <span class="n">dMB</span> <span class="o">|</span> <span class="n">iMB</span> <span class="o">|</span>
+</span><span class='line'><span class="o">+</span><span class="c1">------------------------------+--------+----------+------+-------+------+------+</span>
+</span><span class='line'><span class="o">|</span> <span class="n">table1</span>                 <span class="o">|</span> <span class="n">MyISAM</span>   <span class="o">|</span>   <span class="mi">156382</span>     <span class="o">|</span> <span class="mi">3738</span> <span class="o">|</span>   <span class="mi">570</span> <span class="o">|</span>  <span class="mi">557</span> <span class="o">|</span>   <span class="mi">12</span> <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">table2</span>                 <span class="o">|</span> <span class="n">MyISAM</span>   <span class="o">|</span>   <span class="mi">185280</span>     <span class="o">|</span> <span class="mi">1624</span> <span class="o">|</span>   <span class="mi">311</span> <span class="o">|</span>  <span class="mi">287</span> <span class="o">|</span>   <span class="mi">24</span> <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">table3</span>                 <span class="o">|</span> <span class="n">MyISAM</span>   <span class="o">|</span>   <span class="mi">208823</span>     <span class="o">|</span>  <span class="mi">394</span>  <span class="o">|</span>   <span class="mi">103</span> <span class="o">|</span>   <span class="mi">78</span>  <span class="o">|</span>   <span class="mi">24</span> <span class="o">|</span>
+</span><span class='line'><span class="o">+</span><span class="c1">------------------------------+--------+----------+------+-------+------+------+</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[bzip2したSQLからリストアするコマンド]]></title>

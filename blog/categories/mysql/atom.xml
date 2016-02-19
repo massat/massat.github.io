@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mysql | massat log]]></title>
   <link href="http://massat.github.io/blog/categories/mysql/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-02-19T18:19:56+09:00</updated>
+  <updated>2016-02-19T18:24:22+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,35 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[MySQLでテーブルが使用している容量を確認するSQL]]></title>
+    <link href="http://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/"/>
+    <updated>2016-02-19T18:22:49+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql</id>
+    <content type="html"><![CDATA[<p><a href="http://d.hatena.ne.jp/sho-yamasaki/20120405/1333640589">データベースとテーブルのサイズを確認する方法 &ndash; ふってもハレても</a> より。</p>
+
+<p>```sql
+use databaseName;
+select<br/>
+table_name, engine, table_rows as tbl_rows, avg_row_length as rlen,<br/>
+floor((data_length+index_length)/1024/1024) as allMB,  #総容量
+floor((data_length)/1024/1024) as dMB,  #データ容量
+floor((index_length)/1024/1024) as iMB   #インデックス容量
+from information_schema.tables<br/>
+where table_schema=database()<br/>
+order by (data_length+index_length) desc;</p>
+
+<p>+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+
+| table_name                | engine     | tbl_rows  | rlen | allMB | dMB | iMB |
++&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+
+| table1                 | MyISAM   |   156382     | 3738 |   570 |  557 |   12 |
+| table2                 | MyISAM   |   185280     | 1624 |   311 |  287 |   24 |
+| table3                 | MyISAM   |   208823     |  394  |   103 |   78  |   24 |
++&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;+&mdash;&mdash;&mdash;+
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[bzip2したSQLからリストアするコマンド]]></title>

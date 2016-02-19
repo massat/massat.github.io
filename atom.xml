@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-02-19T18:24:22+09:00</updated>
+  <updated>2016-02-19T23:09:45+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,44 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vim#2]]></title>
+    <link href="http://massat.github.io/blog/2016/02/19/vim-number-2/"/>
+    <updated>2016-02-19T23:08:47+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/19/vim-number-2</id>
+    <content type="html"><![CDATA[<p>進捗。</p>
+
+<h1>.vimrc などを github に置く</h1>
+
+<ol>
+<li><a href="https://github.com/massat/.vim">レポジトリ作った</a></li>
+<li><a href="https://github.com/massat/bootstrap/commit/15fba03162a7462a0321fd436ffc8bb505a2e332">ansible で設定書いた</a></li>
+</ol>
+
+
+<h1>.vimrc</h1>
+
+<p><a href="http://qiita.com/jnchito/items/5141b3b01bced9f7f48f">こちら</a>を参考に<a href="https://github.com/massat/.vim/commit/28cb7ed55225238ed9d9e1b20cf844e2b06fa810">書いた</a></p>
+
+<h1>NeoBundleの導入</h1>
+
+<p>ここから、一気にモダンVimの世界に突入して<a href="https://github.com/massat/.vim/compare/28cb7ed55225238ed9d9e1b20cf844e2b06fa810...master">暗黒面へ堕ちていく</a>。</p>
+
+<h1>パッケージの導入</h1>
+
+<ul>
+<li>unite.vim</li>
+<li>NERTTree</li>
+<li>fugitive.vim</li>
+<li>neomru</li>
+<li>vimproc</li>
+</ul>
+
+
+<p>自転車の練習からいきなり乗用車の路上教習に叩き出されて右往左往してる感じがしてる。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[MySQLでテーブルが使用している容量を確認するSQL]]></title>

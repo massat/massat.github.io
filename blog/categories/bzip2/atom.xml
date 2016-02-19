@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Ops | massat log]]></title>
-  <link href="http://massat.github.io/blog/categories/ops/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Bzip2 | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/bzip2/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
   <updated>2016-02-19T18:19:56+09:00</updated>
   <id>http://massat.github.io/</id>
@@ -31,28 +31,6 @@ $ bunzip2 &lt; ./dump.sql.bz2 | sed -f path/to/sed |  mysql -u user -p database
 </code></p>
 
 <p>みたいにやっている。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[古いログファイルをarchiveしとくスクリプト]]></title>
-    <link href="http://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs/"/>
-    <updated>2012-11-21T11:42:00+09:00</updated>
-    <id>http://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs</id>
-    <content type="html"><![CDATA[<p>書いたのではっとく</p>
-
-<p><div><script src='https://gist.github.com/4122658.js'></script>
-<noscript><pre><code>#!/bin/sh
-
-TODAY=`date +%Y%m%d`
-DIR=&quot;/path/to/dir&quot;
-DAYS=60
-
-find ${DIR} -type f -name &#39;*.log&#39; -daystart -mtime +${DAYS} | while read f; do
-    nice tar czfv ${f}.tgz --directory `dirname ${f}` `basename ${f}`
-    rm ${f}
-done</code></pre></noscript></div>
-</p>
 ]]></content>
   </entry>
   

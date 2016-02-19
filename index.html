@@ -9,8 +9,9 @@
   <meta name="author" content="Masato Hirai a.k.a. massat">
 
   
-  <meta name="description" content="Vimを勉強してみる。
-これまで、サーバー上のファイルを編集するためなどに素のVimを使っていたりはしたが、アプリケーションのコードを書くためのツールとしてみることにする。 ちなみにアプリケーションを書くためのエディタの遍歴としては 新卒で入った会社でJavaをeclipseで書く &hellip;">
+  <meta name="description" content="mysqldump したデータを bzip2 で固めたアーカイブからリストアするコマンドメモ 1
+$ bunzip2 &lt; ./dump.sql.bz2 | mysql -u user -p database という感じ。仕事では間で sed かましたりしてるので実際には 1
+$ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +77,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/">bzip2したSQLからリストアするコマンド</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-19T18:14:25+09:00" pubdate data-updated="true">Feb 19<span>th</span>, 2016</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><code>mysqldump</code> したデータを <code>bzip2</code> で固めたアーカイブからリストアするコマンドメモ</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>bunzip2 &lt; ./dump.sql.bz2 | mysql -u user -p database
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>という感じ。仕事では間で <code>sed</code> かましたりしてるので実際には</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>bunzip2 &lt; ./dump.sql.bz2 | sed -f path/to/sed |  mysql -u user -p database
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>みたいにやっている。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -647,49 +698,6 @@ done</code></pre></noscript></div>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/08/install-q4m-on-amazon-linux-ami/">Amazon Linux AMIにQ4Mをインストール</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-08T17:57:00+09:00" pubdate data-updated="true">Apr 8<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>今運用しているサービスでそろそろジョブキューが必要となりそう。
-インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
-Q4Mはソースからではなく、ビルド済のパッケージを使う。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/04/08/install-q4m-on-amazon-linux-ami/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -705,6 +713,10 @@ Q4Mはソースからではなく、ビルド済のパッケージを使う。</
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/">bzip2したSQLからリストアするコマンド</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/02/17/vim-number-1/">Vim入門#1</a>
       </li>
     
@@ -718,10 +730,6 @@ Q4Mはソースからではなく、ビルド済のパッケージを使う。</
     
       <li class="post">
         <a href="/blog/2014/04/01/ansible-motd-dq2/">Ansible-motd-dq2</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/03/27/vagrant-ansible/">Ansibleの手習いをvagrantにてする</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-02-17T10:46:05+09:00</updated>
+  <updated>2016-02-19T18:19:56+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[bzip2したSQLからリストアするコマンド]]></title>
+    <link href="http://massat.github.io/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/"/>
+    <updated>2016-02-19T18:14:25+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando</id>
+    <content type="html"><![CDATA[<p><code>mysqldump</code> したデータを <code>bzip2</code> で固めたアーカイブからリストアするコマンドメモ</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>bunzip2 &lt; ./dump.sql.bz2 | mysql -u user -p database
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>という感じ。仕事では間で <code>sed</code> かましたりしてるので実際には</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>bunzip2 &lt; ./dump.sql.bz2 | sed -f path/to/sed |  mysql -u user -p database
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>みたいにやっている。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim入門#1]]></title>

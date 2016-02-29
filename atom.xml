@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-02-19T23:09:45+09:00</updated>
+  <updated>2016-02-29T11:39:55+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,28 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[リモートサーバーのvimを256色表示で使えるようにした]]></title>
+    <link href="http://massat.github.io/blog/2016/02/29/enable-256colors-for-remote-vim/"/>
+    <updated>2016-02-29T11:23:58+09:00</updated>
+    <id>http://massat.github.io/blog/2016/02/29/enable-256colors-for-remote-vim</id>
+    <content type="html"><![CDATA[<p>色気を出して、colorschemeに<code>jellybeans</code>を<a href="https://github.com/massat/.vim/commit/33924c5459033557fc40e093a680f21da0ba6e4f">使うようにした。</a>
+ローカルではいい感じにかっちょよく表示されるようになったんだけど、リモートの開発サーバー(ubuntu12.04)上だと色数が足りなくて逆に見にくくなってしまった。</p>
+
+<p><a href="https://emerg3nc3.wordpress.com/2012/07/28/full-256-color-support-for-vim-andor-xterm-on-ubuntu-12-04/">ここ</a>の通り、</p>
+
+<ul>
+<li><code>t_Co=256</code>を<a href="https://github.com/massat/.vim/commit/413ddbd3f0290e1b072419f22b3b4bfb9fe1b8cd">設定する</a></li>
+<li><code>.zshrc</code> に <code>export TERM="xterm-256color"</code> を設定する</li>
+</ul>
+
+
+<p>ことで、表示が綺麗になった。</p>
+
+<p><a href="https://gyazo.com/56e413e2f530344a77d0d0abbfe641e9"><img src="https://i.gyazo.com/56e413e2f530344a77d0d0abbfe641e9.png" alt="https://gyazo.com/56e413e2f530344a77d0d0abbfe641e9" /></a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim#2]]></title>

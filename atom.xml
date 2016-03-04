@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-02-29T11:39:55+09:00</updated>
+  <updated>2016-03-04T09:45:50+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,43 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[インサートモードで覚えたTIPS]]></title>
+    <link href="http://massat.github.io/blog/2016/03/04/vim-tips-for-insert-mode/"/>
+    <updated>2016-03-04T09:08:05+09:00</updated>
+    <id>http://massat.github.io/blog/2016/03/04/vim-tips-for-insert-mode</id>
+    <content type="html"><![CDATA[<p><a href="http://www.amazon.co.jp/gp/product/4048916599/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=247&amp;creative=1211&amp;creativeASIN=4048916599&amp;linkCode=as2&amp;tag=massat02-22">実践VIM</a> より。</p>
+
+<h2>インサートモードでの修正</h2>
+
+<p><code>&lt;Backspace&gt;</code> だけでなく、</p>
+
+<ul>
+<li><code>&lt;C-h&gt;</code>: 直前の1文字削除</li>
+<li><code>&lt;C-w&gt;</code>: 直前の1単語削除</li>
+<li><code>&lt;C-u&gt;</code>: 行頭まで削除</li>
+</ul>
+
+
+<p>というアプローチもある。これはVIM固有のものではなくshell上でも使えるキーバインドだった。知らなかった。</p>
+
+<h2>挿入ノーマルモード</h2>
+
+<p>インサートモードから<code>&lt;C-o&gt;</code>を入力することで、<code>挿入ノーマルモード</code>という状態になる。
+ノーマルモードで1コマンドだけを受けつけて、インサートモードに復帰するというもの。
+紹介されている</p>
+
+<ul>
+<li><code>&lt;C-o&gt;zz</code>: 画面を再描画して、現在の行を中央にする</li>
+</ul>
+
+
+<p>は使えそう。</p>
+
+<p>インサートモード中に使えるコマンドをほとんど知らない。<code>i_CTRL_</code> というプレフィックスでヘルプがひけるが非常にたくさんのことができそうである。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[リモートサーバーのvimを256色表示で使えるようにした]]></title>

@@ -9,9 +9,25 @@
   <meta name="author" content="Masato Hirai a.k.a. massat">
 
   
-  <meta name="description" content="実践VIM より。 インサートモードでの修正 &lt;Backspace&gt; だけでなく、 &lt;C-h&gt;: 直前の1文字削除
-&lt;C-w&gt;: 直前の1単語削除
-&lt;C-u&gt;: 行頭まで削除 というアプローチもある。 &hellip;">
+  <meta name="description" content="pythonのデフォルト引数の挙動は勘違いしそうで怖いので気をつけたい。 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+➜ ~ python
+Python 2.7.11 (default, Feb 2 2016, 21:44:54)
+[GCC 4.2.1 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +93,80 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/03/21/be-careful-of-default-args/">Pythonのデフォルト引数の挙動には気をつけよう</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-21T23:21:04+09:00" pubdate data-updated="true">Mar 21<span>st</span>, 2016</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>pythonのデフォルト引数の挙動は勘違いしそうで怖いので気をつけたい。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ~ python
+</span><span class='line'>Python 2.7.11 <span class="o">(</span>default, Feb  2 2016, 21:44:54<span class="o">)</span>
+</span><span class='line'><span class="o">[</span>GCC 4.2.1 Compatible Apple LLVM 7.0.2 <span class="o">(</span>clang-700.1.81<span class="o">)]</span> on darwin
+</span><span class='line'>Type <span class="s2">&quot;help&quot;</span>, <span class="s2">&quot;copyright&quot;</span>, <span class="s2">&quot;credits&quot;</span> or <span class="s2">&quot;license&quot;</span> <span class="k">for </span>more information.
+</span><span class='line'>&gt;&gt;&gt; def func<span class="o">(</span><span class="nv">arg</span><span class="o">={})</span>:
+</span><span class='line'>...     <span class="k">return </span>arg
+</span><span class='line'>...
+</span><span class='line'>&gt;&gt;&gt; <span class="nv">foo</span> <span class="o">=</span> func<span class="o">()</span>
+</span><span class='line'>&gt;&gt;&gt; foo<span class="o">[</span><span class="s1">&#39;a&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span>
+</span><span class='line'>&gt;&gt;&gt;
+</span><span class='line'>&gt;&gt;&gt; <span class="nv">bar</span> <span class="o">=</span> func<span class="o">()</span>
+</span><span class='line'>&gt;&gt;&gt; bar<span class="o">[</span><span class="s1">&#39;b&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;bar&#39;</span>
+</span><span class='line'>&gt;&gt;&gt; print<span class="o">(</span>foo<span class="o">)</span>
+</span><span class='line'><span class="o">{</span><span class="s1">&#39;a&#39;</span>: <span class="s1">&#39;foo&#39;</span>, <span class="s1">&#39;b&#39;</span>: <span class="s1">&#39;bar&#39;</span><span class="o">}</span>
+</span><span class='line'>&gt;&gt;&gt; print<span class="o">(</span>bar<span class="o">)</span>
+</span><span class='line'><span class="o">{</span><span class="s1">&#39;a&#39;</span>: <span class="s1">&#39;foo&#39;</span>, <span class="s1">&#39;b&#39;</span>: <span class="s1">&#39;bar&#39;</span><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>デフォルト引数はモジュールロード時の1度だけしか評価されないために、呼び出しの間で共有されている。
+なんでこんな仕様にしたんだろうな・・・。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -734,47 +824,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/03/27/vagrant-ansible/">Ansibleの手習いをvagrantにてする</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-03-27T22:49:00+09:00" pubdate data-updated="true">Mar 27<span>th</span>, 2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ansibleがよさげなので<a href="http://docs.ansible.com/intro_getting_started.html">これ</a>みながらvagrantとつなげてみる。</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/03/27/vagrant-ansible/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -790,6 +839,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/03/21/be-careful-of-default-args/">Pythonのデフォルト引数の挙動には気をつけよう</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/03/04/vim-tips-for-insert-mode/">インサートモードで覚えたTIPS</a>
       </li>
     
@@ -803,10 +856,6 @@
     
       <li class="post">
         <a href="/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">MySQLでテーブルが使用している容量を確認するSQL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/">bzip2したSQLからリストアするコマンド</a>
       </li>
     
   </ul>

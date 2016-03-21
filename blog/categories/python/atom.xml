@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Python | massat log]]></title>
+  <link href="http://massat.github.io/blog/categories/python/atom.xml" rel="self"/>
+  <link href="http://massat.github.io/"/>
+  <updated>2016-03-21T23:27:19+09:00</updated>
+  <id>http://massat.github.io/</id>
+  <author>
+    <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Pythonのデフォルト引数の挙動には気をつけよう]]></title>
+    <link href="http://massat.github.io/blog/2016/03/21/be-careful-of-default-args/"/>
+    <updated>2016-03-21T23:21:04+09:00</updated>
+    <id>http://massat.github.io/blog/2016/03/21/be-careful-of-default-args</id>
+    <content type="html"><![CDATA[<p>pythonのデフォルト引数の挙動は勘違いしそうで怖いので気をつけたい。</p>
+
+<p>```sh
+➜  ~ python
+Python 2.7.11 (default, Feb  2 2016, 21:44:54)
+[GCC 4.2.1 Compatible Apple LLVM 7.0.2 (clang-700.1.81)] on darwin
+Type &ldquo;help&rdquo;, &ldquo;copyright&rdquo;, &ldquo;credits&rdquo; or &ldquo;license&rdquo; for more information.</p>
+
+<blockquote><blockquote><blockquote><p>def func(arg={}):
+&hellip;     return arg
+&hellip;
+foo = func()
+foo[&lsquo;a&rsquo;] = &lsquo;foo&rsquo;</p>
+
+<p>bar = func()
+bar[&lsquo;b&rsquo;] = &lsquo;bar&rsquo;
+print(foo)
+{&lsquo;a&rsquo;: &lsquo;foo&rsquo;, &lsquo;b&rsquo;: &lsquo;bar&rsquo;}
+print(bar)
+{&lsquo;a&rsquo;: &lsquo;foo&rsquo;, &lsquo;b&rsquo;: &lsquo;bar&rsquo;}
+```</p></blockquote></blockquote></blockquote>
+
+<p>デフォルト引数はモジュールロード時の1度だけしか評価されないために、呼び出しの間で共有されている。
+なんでこんな仕様にしたんだろうな・・・。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[massat log]]></title>
   <link href="http://massat.github.io/atom.xml" rel="self"/>
   <link href="http://massat.github.io/"/>
-  <updated>2016-03-04T09:45:50+09:00</updated>
+  <updated>2016-03-21T23:27:19+09:00</updated>
   <id>http://massat.github.io/</id>
   <author>
     <name><![CDATA[Masato Hirai a.k.a. massat]]></name>
@@ -12,6 +12,53 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Pythonのデフォルト引数の挙動には気をつけよう]]></title>
+    <link href="http://massat.github.io/blog/2016/03/21/be-careful-of-default-args/"/>
+    <updated>2016-03-21T23:21:04+09:00</updated>
+    <id>http://massat.github.io/blog/2016/03/21/be-careful-of-default-args</id>
+    <content type="html"><![CDATA[<p>pythonのデフォルト引数の挙動は勘違いしそうで怖いので気をつけたい。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>➜  ~ python
+</span><span class='line'>Python 2.7.11 <span class="o">(</span>default, Feb  2 2016, 21:44:54<span class="o">)</span>
+</span><span class='line'><span class="o">[</span>GCC 4.2.1 Compatible Apple LLVM 7.0.2 <span class="o">(</span>clang-700.1.81<span class="o">)]</span> on darwin
+</span><span class='line'>Type <span class="s2">&quot;help&quot;</span>, <span class="s2">&quot;copyright&quot;</span>, <span class="s2">&quot;credits&quot;</span> or <span class="s2">&quot;license&quot;</span> <span class="k">for </span>more information.
+</span><span class='line'>&gt;&gt;&gt; def func<span class="o">(</span><span class="nv">arg</span><span class="o">={})</span>:
+</span><span class='line'>...     <span class="k">return </span>arg
+</span><span class='line'>...
+</span><span class='line'>&gt;&gt;&gt; <span class="nv">foo</span> <span class="o">=</span> func<span class="o">()</span>
+</span><span class='line'>&gt;&gt;&gt; foo<span class="o">[</span><span class="s1">&#39;a&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span>
+</span><span class='line'>&gt;&gt;&gt;
+</span><span class='line'>&gt;&gt;&gt; <span class="nv">bar</span> <span class="o">=</span> func<span class="o">()</span>
+</span><span class='line'>&gt;&gt;&gt; bar<span class="o">[</span><span class="s1">&#39;b&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;bar&#39;</span>
+</span><span class='line'>&gt;&gt;&gt; print<span class="o">(</span>foo<span class="o">)</span>
+</span><span class='line'><span class="o">{</span><span class="s1">&#39;a&#39;</span>: <span class="s1">&#39;foo&#39;</span>, <span class="s1">&#39;b&#39;</span>: <span class="s1">&#39;bar&#39;</span><span class="o">}</span>
+</span><span class='line'>&gt;&gt;&gt; print<span class="o">(</span>bar<span class="o">)</span>
+</span><span class='line'><span class="o">{</span><span class="s1">&#39;a&#39;</span>: <span class="s1">&#39;foo&#39;</span>, <span class="s1">&#39;b&#39;</span>: <span class="s1">&#39;bar&#39;</span><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>デフォルト引数はモジュールロード時の1度だけしか評価されないために、呼び出しの間で共有されている。
+なんでこんな仕様にしたんだろうな・・・。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[インサートモードで覚えたTIPS]]></title>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.18.1" />
+
+<link rel="apple-touch-icon" href="https://massat.github.io/images/logo.png">
+
+
+<link rel="canonical" href="https://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>StarmanとArcherで優雅にデプロイする話 - massat log</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    <script async custom-element="amp-twitter" src="https://cdn.ampproject.org/v0/amp-twitter-0.1.js"></script>
+<script async custom-element="amp-iframe" src="https://cdn.ampproject.org/v0/amp-iframe-0.1.js"></script>
+<script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+
+    
+<meta name="description" content="&lt;p&gt;&lt;a href=&#34;https://github.com/miyagawa/Starman&#34;&gt;Starman&lt;/a&gt;に対してリモートから&lt;a href=&#34;https://github.com/tokuhirom/Archer&#34;&gt;Archer&lt;/a&gt;でソースをデプロイしつつHUPを投げつけるという話。&lt;/p&gt;&lt;p&gt;構成は例えば以下のような感じで、&lt;code&gt;admin&lt;/code&gt;から&lt;code&gt;app*&lt;/code&gt;にばらまく感じ。&lt;/p&gt;&lt;pre&gt;&lt;code&gt;[admin] --&#43;--&amp;gt; [app01]          |          &#43;--&amp;gt; [app02]&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;/p&gt;">
+
+<meta property="og:title" content="StarmanとArcherで優雅にデプロイする話 - massat log">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/">
+<meta property="og:image" content="https://massat.github.io/images/default.png">
+<meta property="og:site_name" content="massat log">
+<meta property="og:description" content="&lt;p&gt;&lt;a href=&#34;https://github.com/miyagawa/Starman&#34;&gt;Starman&lt;/a&gt;に対してリモートから&lt;a href=&#34;https://github.com/tokuhirom/Archer&#34;&gt;Archer&lt;/a&gt;でソースをデプロイしつつHUPを投げつけるという話。&lt;/p&gt;&lt;p&gt;構成は例えば以下のような感じで、&lt;code&gt;admin&lt;/code&gt;から&lt;code&gt;app*&lt;/code&gt;にばらまく感じ。&lt;/p&gt;&lt;pre&gt;&lt;code&gt;[admin] --&#43;--&amp;gt; [app01]          |          &#43;--&amp;gt; [app02]&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;/p&gt;">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="massat log">
+<meta name="twitter:url" content="https://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/">
+<meta name="twitter:title" content="StarmanとArcherで優雅にデプロイする話 - massat log">
+<meta name="twitter:description" content="&lt;p&gt;&lt;a href=&#34;https://github.com/miyagawa/Starman&#34;&gt;Starman&lt;/a&gt;に対してリモートから&lt;a href=&#34;https://github.com/tokuhirom/Archer&#34;&gt;Archer&lt;/a&gt;でソースをデプロイしつつHUPを投げつけるという話。&lt;/p&gt;&lt;p&gt;構成は例えば以下のような感じで、&lt;code&gt;admin&lt;/code&gt;から&lt;code&gt;app*&lt;/code&gt;にばらまく感じ。&lt;/p&gt;&lt;pre&gt;&lt;code&gt;[admin] --&#43;--&amp;gt; [app01]          |          &#43;--&amp;gt; [app02]&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;/p&gt;">
+<meta name="twitter:image" content="https://massat.github.io/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"https:\/\/massat.github.io\/"
+    },
+    "headline": "StarmanとArcherで優雅にデプロイする話 - massat log",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https:\/\/massat.github.io\/images\/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2012-03-31T00:00:00JST",
+    "dateModified": "2012-03-31T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "massat log"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "massat log",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https:\/\/massat.github.io\/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "\x3cp\x3e\x3ca href=\x22https:\/\/github.com\/miyagawa\/Starman\x22\x3eStarman\x3c\/a\x3eに対してリモートから\x3ca href=\x22https:\/\/github.com\/tokuhirom\/Archer\x22\x3eArcher\x3c\/a\x3eでソースをデプロイしつつHUPを投げつけるという話。\x3c\/p\x3e\n\n\x3cp\x3e構成は例えば以下のような感じで、\x3ccode\x3eadmin\x3c\/code\x3eから\x3ccode\x3eapp*\x3c\/code\x3eにばらまく感じ。\x3c\/p\x3e\n\n\x3cpre\x3e\x3ccode\x3e[admin] --\x2b--\x26gt; [app01]\n          |\n          \x2b--\x26gt; [app02]\n\x3c\/code\x3e\x3c\/pre\x3e\n\n\x3cp\x3e\x3c\/p\x3e"
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(https://massat.github.io/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-91939618-1"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="https://massat.github.io/" class="h-logo">massat log</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-ffff3443864353ca089417b6bc4b2c63">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2012/03/31/graceful-deployment-with-starman-and-archer/" class="thumbnail" title="StarmanとArcherで優雅にデプロイする話"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">StarmanとArcherで優雅にデプロイする話</h1>
+        <ul class="p-facts">
+          <li><time datetime="2012-03-31T00:00:00JST">Mar 31, 2012</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f&title=Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f&t=Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f&text=Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1 https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body"><p><a href="https://github.com/miyagawa/Starman">Starman</a>に対してリモートから<a href="https://github.com/tokuhirom/Archer">Archer</a>でソースをデプロイしつつHUPを投げつけるという話。</p>
+
+<p>構成は例えば以下のような感じで、<code>admin</code>から<code>app*</code>にばらまく感じ。</p>
+
+<pre><code>[admin] --+--&gt; [app01]
+          |
+          +--&gt; [app02]
+</code></pre>
+
+<p></p>
+
+<h2 id="starmanの再起動">Starmanの再起動</h2>
+
+<p><a href="https://github.com/miyagawa/Starman/blob/master/README">StarmanのREADME</a>によれば、</p>
+
+<blockquote>
+<p>Supports &ldquo;HUP&rdquo; for graceful worker restarts, and &ldquo;TTIN&rdquo;/&ldquo;TTOU&rdquo; to
+dynamically increase or decrease the number of worker processes, as
+well as &ldquo;QUIT&rdquo; to gracefully shutdown the worker processes.</p>
+</blockquote>
+
+<p>と書いてあって、HUPでGraceful Restartしてくれるとある。</p>
+
+<p>ためしに</p>
+
+<pre><code class="language-sh">% plackup -r -s Starman --pid=/tmp/starman.pid
+
+2012/03/29-19:53:12 Starman::Server (type Net::Server::PreFork) starting! pid(23802)
+
+(中略)
+
+Binding to TCP port 5000 on host *
+Setting gid to &quot;20 20 20 204 100 98 81 80 79 61 12 401 402&quot;
+Starman: Accepting connections at http://*:5000/
+</code></pre>
+
+<p>としてStarmanを起動して別のシェルプロセスから</p>
+
+<pre><code class="language-sh">% sudo kill -HUP `cat /tmp/starman.pid`
+</code></pre>
+
+<p>とすると、Starman側に</p>
+
+<pre><code class="language-sh">Sending children hup signal during HUP on prefork server
+2012/03/29-19:54:12 Server closing!
+</code></pre>
+
+<p>と表示される。</p>
+
+<p>ちなみにStarmanはRubyの<a href="http://unicorn.bogomips.org/">Unicorn</a>ライクなものなのかなーと思っていたけど、</p>
+
+<blockquote>
+<p>The name Starman is taken from the song (<em>Star na Otoko</em>) by the
+Japanese rock band Unicorn (yes, Unicorn!). It&rsquo;s also known as a song by
+David Bowie, a power-up from Super Mario Brothers and a character from
+Earthbound, all of which I love.</p>
+</blockquote>
+
+<p>とあって、 &ldquo;Unicorn -&gt; ユニコーン -&gt; スターな男 -&gt; Starman&rdquo; ってことかしら。</p>
+
+<h2 id="archerでのデプロイ">Archerでのデプロイ</h2>
+
+<p>Archerでリモートホストから rsync でソースを投げた後、Starman にHUPを投げたい。
+正直Archerはまだあまり使いかたがわかってない。</p>
+
+<p>設定ファイルは<a href="https://github.com/tokuhirom/Archer/blob/master/assets/kwalify/schema.yaml">ここ</a>とか<a href="https://github.com/tokuhirom/Archer/blob/master/examples/config.yaml">ここ</a>とかよく見ておこうと思う。あとソースも。</p>
+
+<p>今回は以下のような感じ。</p>
+
+<p>```yml deploy.yml
+global:
+  work_dir: /path/to/work_dir
+  dest_dir: /path/to/dest_dir
+  assets_path: assets
+  log:
+    level: debug</p>
+
+<p>tasks:
+  init:
+    - module: Confirm
+      name: confirm
+      config:
+        msg: &lsquo;deploy ok? [y/n]&rsquo;
+  process:
+    - module: Rsync
+      name: rsync
+      role: app
+      config:
+        user: app
+        verbose: 1
+        archive: 1
+        compress: 1
+        rsh: ssh
+        update: 0
+        delete: 1
+        source: /path/to/source
+        exclude:
+          - .svn/
+          - tmp/*
+          - log/*
+    - module: Exec::Remote
+      name: restart
+      role: app
+      config:
+        command: &ldquo;-t &lsquo;sudo kill -HUP <code>cat /tmp/starman.pid</code>&rsquo;&rdquo;
+projects:
+  example:
+    app:
+      - app01
+      - app02</p>
+
+<pre><code>
+tasks.process の
+
+```yml
+    - module: Exec::Remote
+      name: restart
+      role: app
+      config:
+        command: &quot;-t 'sudo kill -HUP `cat /tmp/starman.pid`'&quot;
+</code></pre>
+
+<p>で、リモートからSSHログインしてHUPを送ることをしている。
+実際には</p>
+
+<pre><code class="language-sh">sudo -u app ssh app01 -t 'sudo kill -HUP `cat /tmp/starman.pid`'
+</code></pre>
+
+<p>って感じに展開される。
+当然app*に対しては公開鍵認証設定するなどしてパスワードなしでSSHログインできるようにしておくのと、killとcatはsudoで実行できるようにしておく必要がある。</p>
+
+<p>sshの<code>-t</code>オプションっていうのは知らなかったんだけど、</p>
+
+<pre><code>-t      Force pseudo-tty allocation.  This can be used to execute arbitrary screen-based programs on a remote machine, which can be very
+        useful, e.g. when implementing menu services.  Multiple -t options force tty allocation, even if ssh has no local tty.
+</code></pre>
+
+<p>というもの。これがないと</p>
+
+<pre><code class="language-sh">sudo: sorry, you must have a tty to run sudo
+</code></pre>
+
+<p>と怒られるのを回避できる。</p>
+
+<p>これで</p>
+
+<pre><code class="language-sh">archer.pl --config=deploy.yaml
+</code></pre>
+
+<p>って感じで実行すると、先ほどと同じようにapp*側のStarmanが再起動されるはず。</p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>StarmanとArcherで、デプロイからのGraceful Restartを構成した。</p>
+
+<p>実運用する場合にはStarmanをdaemontoolsとかsupervisordとかで監視したりってのも出てくると思うけど、基本的には同じ話かと思う。
+daemontoolsにはsvcってユーティリティでシグナルの送信ができるので、sudo killできる必要がなくなる。
+supervisordはsupervisorctlに<code>restart</code>ってコマンドがあるんだけど、これがHUPを送るものなのかは確認していない。</p></div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f&title=Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f&t=Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f&text=Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Starman%e3%81%a8Archer%e3%81%a7%e5%84%aa%e9%9b%85%e3%81%ab%e3%83%87%e3%83%97%e3%83%ad%e3%82%a4%e3%81%99%e3%82%8b%e8%a9%b1 https%3a%2f%2fmassat.github.io%2fblog%2f2012%2f03%2f31%2fgraceful-deployment-with-starman-and-archer%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="https://massat.github.io/">massat log</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://massat.github.io/blog/" itemprop="url"><span itemprop="title">blog</span></a></li>
+        
+        <li>StarmanとArcherで優雅にデプロイする話</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://massat.github.io/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="https://massat.github.io/categories/perl/">perl</a></li>
+            
+            <li><a href="https://massat.github.io/categories/deploy/">deploy</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-c09a9531d89b5a5e12599f69ccd1b749">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/03/21/be-careful-of-default-args/" class="thumbnail" title="pythonのデフォルト引数の挙動には気をつけよう"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/03/21/be-careful-of-default-args/">pythonのデフォルト引数の挙動には気をつけよう</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-03-21T23:21:04JST">Mar 21, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-97a2060e0df353ade0415db743e446c9">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/03/04/vim-tips-for-insert-mode/" class="thumbnail" title="インサートモードで覚えたTIPS"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/03/04/vim-tips-for-insert-mode/">インサートモードで覚えたTIPS</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-03-04T09:08:05JST">Mar 4, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-0bada6bfc38d068d9019d18b0a7a49e5">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/02/29/enable-256colors-for-remote-vim/" class="thumbnail" title="リモートサーバーのvimを256色表示で使えるようにした"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/02/29/enable-256colors-for-remote-vim/">リモートサーバーのvimを256色表示で使えるようにした</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-02-29T11:23:58JST">Feb 29, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-ea4e0520ace25d9c656ddc93acd9f202">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/02/19/vim-number-2/" class="thumbnail" title="vim#2"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/02/19/vim-number-2/">vim#2</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-02-19T23:08:47JST">Feb 19, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-ad20739ee574ff81d68c8177f5c709fe">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/" class="thumbnail" title="MySQLでテーブルが使用している容量を確認するSQL"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">MySQLでテーブルが使用している容量を確認するSQL</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-02-19T18:22:49JST">Feb 19, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-d3ae84c4128e18ddd0cd31aa38803a59">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/" class="thumbnail" title="bzip2したSQLからリストアするコマンド"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/02/19/bzip2sitasqlkararisutoasurukomando/">bzip2したSQLからリストアするコマンド</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-02-19T18:14:25JST">Feb 19, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-9a9cf025c3a877ad2f593f3b64a7a71b">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/02/17/vim-number-1/" class="thumbnail" title="vim入門#1"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/02/17/vim-number-1/">vim入門#1</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-02-17T09:48:51JST">Feb 17, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-3602f7325d6e6ac6a4e0bbafc1fa711f">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2015/03/03/kamakurago-vol1/" class="thumbnail" title="kamakura.go #1 を開催しました。"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2015/03/03/kamakurago-vol1/">kamakura.go #1 を開催しました。</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2015-03-03T00:06:43JST">Mar 3, 2015</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-75f96be68dbcfe593e2090d559cf92ca">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2014/07/08/bootstrap-my-mac/" class="thumbnail" title="bootstrap-my-mac"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2014/07/08/bootstrap-my-mac/">bootstrap-my-mac</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2014-07-08T22:02:36JST">Jul 8, 2014</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-96447c280b5c3829f90dd662f5b8090d">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2014/04/01/ansible-motd-dq2/" class="thumbnail" title="ansible-motd-dq2"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2014/04/01/ansible-motd-dq2/">ansible-motd-dq2</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2014-04-01T21:53:02JST">Apr 1, 2014</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-0f2da13a0b36bfbc46cb7a11b6013593">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2014/03/27/vagrant-ansible/" class="thumbnail" title="ansibleの手習いをvagrantにてする"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2014/03/27/vagrant-ansible/">ansibleの手習いをvagrantにてする</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2014-03-27T00:00:00JST">Mar 27, 2014</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-1c5d1230982a325c4f30a0d35c0dad44">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/" class="thumbnail" title="Amazon AMIにmroongaをインストールする"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/">Amazon AMIにmroongaをインストールする</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2013-08-20T00:00:00JST">Aug 20, 2013</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-93ce9b92729142d6b8693d79438067e2">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/" class="thumbnail" title="64bit版Amazon AMIにcheckinstallをインストールする"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/">64bit版Amazon AMIにcheckinstallをインストールする</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2013-02-16T00:00:00JST">Feb 16, 2013</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-e68fd03579f0152920159fec293146a8">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2012/11/24/setup-php-on-mountain-lion/" class="thumbnail" title="Mountain Lion にPHP開発環境をつくった"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2012/11/24/setup-php-on-mountain-lion/">Mountain Lion にPHP開発環境をつくった</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2012-11-24T00:00:00JST">Nov 24, 2012</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-3b3e2c14295a8098c4dcdf4085e9f875">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs/" class="thumbnail" title="古いログファイルをarchiveしとくスクリプト"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs/">古いログファイルをarchiveしとくスクリプト</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2012-11-21T00:00:00JST">Nov 21, 2012</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-b42b2fd104cb14eb6684b4390cc1044a">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/" class="thumbnail" title="Amazon Linux AMIにQ4Mをインストール"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/">Amazon Linux AMIにQ4Mをインストール</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2012-04-08T00:00:00JST">Apr 8, 2012</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-a8750783f5ccd71950917598529badb2">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2012/04/05/markdown-slider/" class="thumbnail" title="markdownからHTMLスライドをつくるgemを書いた"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2012/04/05/markdown-slider/">markdownからHTMLスライドをつくるgemを書いた</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2012-04-05T00:00:00JST">Apr 5, 2012</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6f248f6c2e59239cf1e896ffb602dd85">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/" class="thumbnail" title="Octpresとgithub pagesでBlogをつくってみた"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/">Octpresとgithub pagesでBlogをつくってみた</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2012-03-23T00:00:00JST">Mar 23, 2012</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; massat log</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

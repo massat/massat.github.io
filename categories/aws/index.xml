@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Aws on massat log</title>
+    <link>https://massat.github.io/categories/aws/index.xml</link>
+    <description>Recent content in Aws on massat log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <atom:link href="https://massat.github.io/categories/aws/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Amazon AMIにmroongaをインストールする</title>
+      <link>https://massat.github.io/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/</link>
+      <pubDate>Tue, 20 Aug 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://massat.github.io/blog/2013/08/20/install-mroonga-on-amazon-linux-ami/</guid>
+      <description>&lt;p&gt;EC2上にmroongaによって全文検索可能なDBを構築した。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;環境&#34;&gt;環境&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;amzn-ami-pv-2013.03.1.x86_64-ebs (ami-39b23d38)&lt;/li&gt;
+&lt;li&gt;mysql5.6.13&lt;/li&gt;
+&lt;li&gt;groonga3.06&lt;/li&gt;
+&lt;li&gt;mroonga3.06&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;mysqlはオフィシャルで配布してるrpmパッケージから。
+groonga、mroongaはソースからビルドしてインストールした。&lt;/p&gt;
+
+&lt;h1 id=&#34;準備&#34;&gt;準備&lt;/h1&gt;
+
+&lt;h3 id=&#34;checkinstall&#34;&gt;checkinstall&lt;/h3&gt;
+
+&lt;p&gt;ソースからビルドするものについても、checkinstallでrpm化してインストールする。
+64bit版のAMIにcheckinstallをインストールする手順は&lt;a href=&#34;http://massat.jp/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/&#34;&gt;こちら&lt;/a&gt;を参照&lt;/p&gt;
+
+&lt;h1 id=&#34;mysqlのインストール&#34;&gt;MySQLのインストール&lt;/h1&gt;
+
+&lt;p&gt;オフィシャルで配布されている Linux Generic な rpm をインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;~ # rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-shared-compat-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/
+~ # rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-server-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/
+~ # rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-devel-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/
+~ # rpm -ivh http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-client-5.6.13-1.linux_glibc2.5.x86_64.rpm/from/http://cdn.mysql.com/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デフォルトの&lt;code&gt;my.cnf&lt;/code&gt;の場所が&lt;code&gt;/usr/my.cnf&lt;/code&gt;になったみたい。
+あと、mysql5.6からはデフォルトの&lt;code&gt;sql_mode&lt;/code&gt;が変わって&lt;a href=&#34;https://www.google.co.jp/search?q=mysql+5.6+sql_mode&#34;&gt;よくエラーになるらしいので注意&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;mecabのインストール&#34;&gt;MeCabのインストール&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;~ # yum install mecab mecab-devel mecab-ipadic
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;groongaのインストール&#34;&gt;groongaのインストール&lt;/h1&gt;
+
+&lt;h3 id=&#34;ビルドに必要なライブラリ&#34;&gt;ビルドに必要なライブラリ&lt;/h3&gt;
+
+&lt;p&gt;要らないものもあるかも&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;~ # yum install gcc-c++ make automake libtool
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;インストール&#34;&gt;インストール&lt;/h3&gt;
+
+&lt;p&gt;だいたいは&lt;a href=&#34;http://groonga.org/ja/docs/install/centos.html#build-from-source&#34;&gt;ここ&lt;/a&gt;の手順に従った。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;~ # cd /usr/local/src/
+src # wget http://packages.groonga.org/source/groonga/groonga-3.0.6.tar.gz
+src # tar xzf groonga-3.0.6.tar.gz
+src # cd groonga-3.0.6
+groonga-3.0.6 # ./configure
+groonga-3.0.6 # make -j$(grep &#39;^processor&#39; /proc/cpuinfo | wc -l)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;んで、&lt;code&gt;make install&lt;/code&gt; ではなくて &lt;code&gt;checkinstall&lt;/code&gt; でrpmにする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;groonga-3.0.6 # checkinstall
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;だけどコケる。
+checkinstallがmake中に、どうやら必要なディレクトリが作れていない。
+試行錯誤の末、以下のディレクトリを作ればビルドできる（と思う）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;groonga-3.0.6 # mkdir -p /usr/local/include/groonga/groonga
+groonga-3.0.6 # mkdir -p /usr/local/lib/groonga/plugins/tokenizers
+groonga-3.0.6 # mkdir -p /usr/local/lib/groonga/plugins/suggest
+groonga-3.0.6 # mkdir -p /usr/local/lib/groonga/plugins/table
+groonga-3.0.6 # mkdir -p /usr/local/lib/groonga/plugins/query_expanders
+groonga-3.0.6 # mkdir -p /usr/local/etc/groonga
+groonga-3.0.6 # mkdir -p /usr/local/var/run/groonga
+groonga-3.0.6 # mkdir -p /usr/local/var/log/groonga/httpd
+groonga-3.0.6 # mkdir -p /usr/local/share/groonga/examples/dictionary/edict
+groonga-3.0.6 # mkdir -p /usr/local/share/groonga/examples/dictionary/html/css/smoothness/images
+groonga-3.0.6 # mkdir -p /usr/local/share/groonga/images/logo
+groonga-3.0.6 # mkdir -p /usr/local/share/doc/groonga/en/html/reference/command
+groonga-3.0.6 # mkdir -p /usr/local/share/doc/groonga/en/html/_sources/contribution/development
+groonga-3.0.6 # mkdir -p /usr/local/share/doc/groonga/en/html/_sources/reference/api
+groonga-3.0.6 # mkdir -p /usr/local/share/doc/groonga/en/html/server/http
+groonga-3.0.6 # mkdir -p /usr/local/share/doc/groonga/en/html/_sources/server/http
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;その上で、checkinstallでrpmを作ってインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;groonga-3.0.6 # checkinstall
+groonga-3.0.6 # rpm -ivh /root/rpmbuild/RPMS/x86_64/groonga-3.0.6-1.x86_64.rpm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;mroongaのインストール&#34;&gt;mroongaのインストール&lt;/h3&gt;
+
+&lt;p&gt;手順はほぼ&lt;a href=&#34;http://mroonga.org/ja/docs/install.html#install-from-the-source-code&#34;&gt;こちら&lt;/a&gt;の通り&lt;/p&gt;
+
+&lt;p&gt;まずはMySQLのソースコードがmroongaのビルドに必要なので落としてくる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;src # wget http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.13.tar.gz/from/http://cdn.mysql.com/
+src # tar xzf mysql-5.6.13.tar.gz
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;mroongaのソースコードを取得後、ビルドしてインストール。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;src # wget http://packages.groonga.org/source/mroonga/mroonga-3.06.tar.gz
+src # tar xzf mroonga-3.06.tar.gz
+src # cd mroonga-3.06
+mroonga-3.06 # ./configure PKG_CONFIG_PATH=/usr/local/lib/pkgconfig  --with-mysql-source=/usr/local/src/mysql-5.6.13 --with-mysql-config=/usr/bin/mysql_config
+mroonga-3.06 # make
+mroonga-3.06 # checkinstall
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;んが、groongaの時と同様に、ディレクトリが作れずこける。
+ので、手対応。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;mroonga-3.06 # mkdir -p &#39;/usr/local/share/doc/mroonga/en/html/_sources/dev
+mroonga-3.06 # mkdir -p &#39;/usr/local/share/doc/mroonga/source/reference&#39;
+mroonga-3.06 # checkinstall
+mroonga-3.06 # rpm -ivh /root/rpmbuild/RPMS/x86_64/mroonga-3.06-1.x86_64.rpm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MySQL起動後、mroongaをプラグインとしてインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;mysql&amp;gt; INSTALL PLUGIN mroonga SONAME &#39;ha_mroonga.so&#39;;
+Query OK, 0 rows affected (0.30 sec)
+
+mysql&amp;gt; CREATE FUNCTION last_insert_grn_id RETURNS INTEGER SONAME &#39;ha_mroonga.so&#39;;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; CREATE FUNCTION mroonga_snippet RETURNS STRING SONAME &#39;ha_mroonga.so&#39;;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; CREATE FUNCTION mroonga_command RETURNS STRING SONAME &#39;ha_mroonga.so&#39;;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; show engines;
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+| mroonga            | YES     | CJK-ready fulltext search, column store                        | NO           | NO   | NO         |
+| MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+| ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+10 rows in set (0.02 sec)
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>64bit版Amazon AMIにcheckinstallをインストールする</title>
+      <link>https://massat.github.io/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/</link>
+      <pubDate>Sat, 16 Feb 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://massat.github.io/blog/2013/02/16/install-checkinstall-on-amazon-ami-64bit/</guid>
+      <description>&lt;p&gt;64bit環境でのcheckinstallのインストール手順をすぐ忘れるのでメモ&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;準備&#34;&gt;準備&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# yum -y install git make gettext gcc rpm-build
+# cd /usr/local/src/
+# git clone http://checkinstall.izto.org/checkinstall.git
+# cd checkinstall/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;64bit向けにpatchをあてる&#34;&gt;64bit向けにpatchをあてる&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://gist.github.com/massat/4967004&#34;&gt;これらのpatch&lt;/a&gt;をあてる&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# curl https://gist.github.com/massat/4967004/raw/0a485150b270cb9e9397d1040963a627a86436e2/Makefile.patch | patch -u Makefile
+# curl https://gist.github.com/massat/4967004/raw/2e447f2a7519337ca8d15a80e0bad31871b39eb7/checkinstallrc-dist.patch | patch -u checkinstallrc-dist
+# curl https://gist.github.com/massat/4967004/raw/bb87f7ee31d0758e5cec9c8d430215739428ecc1/installwatch+Makefile.patch | patch -u installwatch/Makefile
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;checkinstallをrpm化&#34;&gt;checkinstallをRPM化&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# mkdir -p ~/rpmbuild/SOURCES
+# make
+# make install
+# checkinstall
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;いくつか質問される。パッケージを選ぶ質問には&amp;rdquo;R&amp;rdquo;(rpm)を入力。その他はReturnのみでOK。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;**********************************************************************
+
+ Done. The new package has been saved to
+
+ /root/rpmbuild/RPMS/x86_64/checkinstall-20130216-1.x86_64.rpm
+ You can install it in your system anytime using:
+
+       rpm -i checkinstall-20130216-1.x86_64.rpm
+
+**********************************************************************
+
+# rpm -ivh /root/rpmbuild/RPMS/x86_64/checkinstall-20130216-1.x86_64.rpm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;インストールを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# rpm -qi checkinstall
+Name        : checkinstall                 Relocations: (not relocatable)
+Version     : 20130216                          Vendor: (none)
+Release     : 1                             Build Date: Sat 16 Feb 2013 02:13:02 PM UTC
+Install Date: Sat 16 Feb 2013 02:18:34 PM UTC      Build Host: ip-10-152-103-196.ap-northeast-1.compute.internal
+Group       : Applications/System           Source RPM: checkinstall-20130216-1.src.rpm
+Size        : 453850                           License: GPL
+Signature   : (none)
+Packager    : checkinstall-1.6.3
+Summary     : CheckInstall installations tracker, version 1.6.2
+Description :
+CheckInstall installations tracker, version 1.6.2
+
+CheckInstall  keeps  track of all the files created  or
+modified  by your installation  script  (&amp;quot;make install&amp;quot;
+&amp;quot;make install_modules&amp;quot;,  &amp;quot;setup&amp;quot;,   etc),   builds    a
+standard   binary   package and  installs  it  in  your
+system giving you the ability to uninstall it with your
+distribution&#39;s  standard package management  utilities.
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>Amazon Linux AMIにQ4Mをインストール</title>
+      <link>https://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/</link>
+      <pubDate>Sun, 08 Apr 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://massat.github.io/blog/2012/04/08/install-q4m-on-amazon-linux-ami/</guid>
+      <description>&lt;p&gt;今運用しているサービスでそろそろジョブキューが必要となりそう。
+インストール手順を確認がてら、EC2にQ4Mをインストールしてみる。
+Q4Mはソースからではなく、ビルド済のパッケージを使う。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;EC2でmicroインスタンスたちあげて、Q4Mをインストール。
+AMIにはAmazon Linux AMIを使用した。
+このエントリ時点のAMIのバージョンは&lt;code&gt;amzn-ami-pv-2012.03.1.x86_64-ebs (ami-e47acbe5)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h2 id=&#34;mysqlのインストール&#34;&gt;MySQLのインストール&lt;/h2&gt;
+
+&lt;p&gt;Officialのrpmをつかってインストール。
+現在配布されている最新のビルド済Q4MはMySQL5.1.55向けのもの。
+MySQLサイトからRPMをダウンロードしてインストール。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# wget http://downloads.mysql.com/archives/mysql-5.1/MySQL-server-5.1.55-1.glibc23.x86_64.rpm
+# wget http://downloads.mysql.com/archives/mysql-5.1/MySQL-client-5.1.55-1.glibc23.x86_64.rpm
+# rpm -ivh MySQL-server-5.1.55-1.glibc23.x86_64.rpm
+# rpm -ivh MySQL-client-5.1.55-1.glibc23.x86_64.rpm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;q4mのインストール&#34;&gt;Q4Mのインストール&lt;/h2&gt;
+
+&lt;p&gt;MySQLが&lt;code&gt;--with-fast-mutexes&lt;/code&gt;オプションを使ってコンパイルされているかどうかで使用するQ4Mのパッケージが変わる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# cat `which mysqlbug` | grep CONFIGURE_LINE
+CONFIGURE_LINE=&amp;quot;./configure  &#39;--with-mysqld-ldflags=-static&#39; &#39;--with-client-ldflags=-static&#39; &#39;--enable-assembler&#39; &#39;--enable-local-infile&#39; &#39;--with-fast-mutexes&#39; &#39;--with-mysqld-user=mysql&#39; &#39;--with-unix-socket-path=/var/lib/mysql/mysql.sock&#39; &#39;--with-pic&#39; &#39;--prefix=/&#39; &#39;--with-extra-charsets=complex&#39; &#39;--with-ssl&#39; &#39;--exec-prefix=/usr&#39; &#39;--libexecdir=/usr/sbin&#39; &#39;--libdir=/usr/lib64&#39; &#39;--sysconfdir=/etc&#39; &#39;--datadir=/usr/share&#39; &#39;--localstatedir=/var/lib/mysql&#39; &#39;--infodir=/usr/share/info&#39; &#39;--includedir=/usr/include&#39; &#39;--mandir=/usr/share/man&#39; &#39;--enable-thread-safe-client&#39; &#39;--with-comment=MySQL Community Server (GPL)&#39; &#39;--with-readline&#39; &#39;--with-zlib-dir=bundled&#39; &#39;--without-plugin-ndbcluster&#39; &#39;--with-plugin-innobase&#39; &#39;--without-plugin-innodb_plugin&#39; &#39;--with-plugin-partition&#39; &#39;--with-plugin-csv&#39; &#39;--with-plugin-archive&#39; &#39;--with-plugin-blackhole&#39; &#39;--with-plugin-federated&#39; &#39;--without-plugin-daemon_example&#39; &#39;--without-plugin-ftexample&#39; &#39;--with-embedded-server&#39; &#39;--with-big-tables&#39; &#39;--enable-shared&#39; &#39;CC=gcc&#39; &#39;CFLAGS=-O2 -g -pipe&#39; &#39;LDFLAGS=&#39; &#39;CXX=gcc&#39; &#39;CXXFLAGS=-O2 -g -pipe -felide-constructors -fno-exceptions -fno-rtti &#39;&amp;quot;
+`test -n &amp;quot;$CONFIGURE_LINE&amp;quot;  &amp;amp;&amp;amp; echo &amp;quot;Configure command: $CONFIGURE_LINE&amp;quot;`
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;コンパイルオプションに&lt;code&gt;--with-fast-mutexes&lt;/code&gt;があるので、それ用のパッケージをDLしてインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# wget http://q4m.kazuhooku.com/dist/mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz
+# tar xzf mysql-5.1.55-linux-x86_64-glibc23-with-fast-mutexes-q4m-0.9.5.tar.gz
+# cd q4m-0.9.5-linux-unknown/
+# cp support-files/q4m-forward /usr/bin/
+# cp libqueue_engine.so /usr/lib64/mysql/plugin/
+# mysql &amp;lt; support-files/install.sql
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;動作確認&#34;&gt;動作確認&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;# mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 3
+Server version: 5.1.55 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2010, Oracle and/or its affiliates. All rights reserved.
+This software comes with ABSOLUTELY NO WARRANTY. This is free software,
+and you are welcome to modify and redistribute it under the GPL v2 license
+
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
+
+mysql&amp;gt; show engines;
++------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| Engine     | Support | Comment                                                        | Transactions | XA   | Savepoints |
++------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| InnoDB     | YES     | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| MRG_MYISAM | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| QUEUE      | YES     | Queue storage engine for MySQL                                 | NO           | NO   | NO         |
+| CSV        | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| MEMORY     | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| FEDERATED  | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+| ARCHIVE    | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+| BLACKHOLE  | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| MyISAM     | DEFAULT | Default engine as of MySQL 3.23 with great performance         | NO           | NO   | NO         |
++------------+---------+----------------------------------------------------------------+--------------+------+------------+
+9 rows in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;QUEUE&lt;/code&gt;エンジンが確認できた。&lt;/p&gt;
+
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+
+&lt;p&gt;とりあえずインストールだけ。
+worker書いたりはまた後日。Rubyで書くつもり。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

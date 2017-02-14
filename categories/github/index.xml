@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Github on massat log</title>
+    <link>https://massat.github.io/categories/github/index.xml</link>
+    <description>Recent content in Github on massat log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <atom:link href="https://massat.github.io/categories/github/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Octpresとgithub pagesでBlogをつくってみた</title>
+      <link>https://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/</link>
+      <pubDate>Fri, 23 Mar 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://massat.github.io/blog/2012/03/23/create-a-blog-with-octpress-and-github-pages/</guid>
+      <description>&lt;p&gt;クールなハッカーさんたちのためのモダンなブログ環境を作ってみた。
+手順は &lt;a href=&#34;http://octopress.org/docs/&#34;&gt;ここ&lt;/a&gt;の内容を順に追っていただけ。&lt;/p&gt;
+
+&lt;p&gt;手元でMarkdownで書いて、&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ rake generate
+$ rake deploy
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;で投稿できるなんてお手軽でいーですね。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$rake preview
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;でWEBrickが立ち上がってプレビューもできます。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

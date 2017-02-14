@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vim on massat log</title>
+    <link>https://massat.github.io/categories/vim/index.xml</link>
+    <description>Recent content in Vim on massat log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <atom:link href="https://massat.github.io/categories/vim/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>インサートモードで覚えたTIPS</title>
+      <link>https://massat.github.io/2016/03/04/vim-tips-for-insert-mode/</link>
+      <pubDate>Fri, 04 Mar 2016 09:08:05 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2016/03/04/vim-tips-for-insert-mode/</guid>
+      <description>
+
+&lt;p&gt;&lt;a href=&#34;http://www.amazon.co.jp/gp/product/4048916599/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=1211&amp;amp;creativeASIN=4048916599&amp;amp;linkCode=as2&amp;amp;tag=massat02-22&#34;&gt;実践VIM&lt;/a&gt; より。&lt;/p&gt;
+
+&lt;h2 id=&#34;インサートモードでの修正&#34;&gt;インサートモードでの修正&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;&amp;lt;Backspace&amp;gt;&lt;/code&gt; だけでなく、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;C-h&amp;gt;&lt;/code&gt;: 直前の1文字削除&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;C-w&amp;gt;&lt;/code&gt;: 直前の1単語削除&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;C-u&amp;gt;&lt;/code&gt;: 行頭まで削除&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;というアプローチもある。これはVIM固有のものではなくshell上でも使えるキーバインドだった。知らなかった。&lt;/p&gt;
+
+&lt;h2 id=&#34;挿入ノーマルモード&#34;&gt;挿入ノーマルモード&lt;/h2&gt;
+
+&lt;p&gt;インサートモードから&lt;code&gt;&amp;lt;C-o&amp;gt;&lt;/code&gt;を入力することで、&lt;code&gt;挿入ノーマルモード&lt;/code&gt;という状態になる。
+ノーマルモードで1コマンドだけを受けつけて、インサートモードに復帰するというもの。
+紹介されている&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;C-o&amp;gt;zz&lt;/code&gt;: 画面を再描画して、現在の行を中央にする&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;は使えそう。&lt;/p&gt;
+
+&lt;p&gt;インサートモード中に使えるコマンドをほとんど知らない。&lt;code&gt;i_CTRL_&lt;/code&gt; というプレフィックスでヘルプがひけるが非常にたくさんのことができそうである。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>リモートサーバーのvimを256色表示で使えるようにした</title>
+      <link>https://massat.github.io/2016/02/29/enable-256colors-for-remote-vim/</link>
+      <pubDate>Mon, 29 Feb 2016 11:23:58 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2016/02/29/enable-256colors-for-remote-vim/</guid>
+      <description>&lt;p&gt;色気を出して、colorschemeに&lt;code&gt;jellybeans&lt;/code&gt;を&lt;a href=&#34;https://github.com/massat/.vim/commit/33924c5459033557fc40e093a680f21da0ba6e4f&#34;&gt;使うようにした。&lt;/a&gt;
+ローカルではいい感じにかっちょよく表示されるようになったんだけど、リモートの開発サーバー(ubuntu12.04)上だと色数が足りなくて逆に見にくくなってしまった。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://emerg3nc3.wordpress.com/2012/07/28/full-256-color-support-for-vim-andor-xterm-on-ubuntu-12-04/&#34;&gt;ここ&lt;/a&gt;の通り、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;t_Co=256&lt;/code&gt;を&lt;a href=&#34;https://github.com/massat/.vim/commit/413ddbd3f0290e1b072419f22b3b4bfb9fe1b8cd&#34;&gt;設定する&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.zshrc&lt;/code&gt; に &lt;code&gt;export TERM=&amp;quot;xterm-256color&amp;quot;&lt;/code&gt; を設定する&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ことで、表示が綺麗になった。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://gyazo.com/56e413e2f530344a77d0d0abbfe641e9&#34;&gt;&lt;img src=&#34;https://i.gyazo.com/56e413e2f530344a77d0d0abbfe641e9.png&#34; alt=&#34;https://gyazo.com/56e413e2f530344a77d0d0abbfe641e9&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>vim#2</title>
+      <link>https://massat.github.io/2016/02/19/vim-number-2/</link>
+      <pubDate>Fri, 19 Feb 2016 23:08:47 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2016/02/19/vim-number-2/</guid>
+      <description>
+
+&lt;p&gt;進捗。&lt;/p&gt;
+
+&lt;h1 id=&#34;vimrc-などを-github-に置く&#34;&gt;.vimrc などを github に置く&lt;/h1&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/massat/.vim&#34;&gt;レポジトリ作った&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/massat/bootstrap/commit/15fba03162a7462a0321fd436ffc8bb505a2e332&#34;&gt;ansible で設定書いた&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&#34;vimrc&#34;&gt;.vimrc&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://qiita.com/jnchito/items/5141b3b01bced9f7f48f&#34;&gt;こちら&lt;/a&gt;を参考に&lt;a href=&#34;https://github.com/massat/.vim/commit/28cb7ed55225238ed9d9e1b20cf844e2b06fa810&#34;&gt;書いた&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;neobundleの導入&#34;&gt;NeoBundleの導入&lt;/h1&gt;
+
+&lt;p&gt;ここから、一気にモダンVimの世界に突入して&lt;a href=&#34;https://github.com/massat/.vim/compare/28cb7ed55225238ed9d9e1b20cf844e2b06fa810...master&#34;&gt;暗黒面へ堕ちていく&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h1 id=&#34;パッケージの導入&#34;&gt;パッケージの導入&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;unite.vim&lt;/li&gt;
+&lt;li&gt;NERTTree&lt;/li&gt;
+&lt;li&gt;fugitive.vim&lt;/li&gt;
+&lt;li&gt;neomru&lt;/li&gt;
+&lt;li&gt;vimproc&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;自転車の練習からいきなり乗用車の路上教習に叩き出されて右往左往してる感じがしてる。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>vim入門#1</title>
+      <link>https://massat.github.io/2016/02/17/vim-number-1/</link>
+      <pubDate>Wed, 17 Feb 2016 09:48:51 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2016/02/17/vim-number-1/</guid>
+      <description>
+
+&lt;p&gt;Vimを勉強してみる。
+これまで、サーバー上のファイルを編集するためなどに素のVimを使っていたりはしたが、アプリケーションのコードを書くためのツールとしてみることにする。&lt;/p&gt;
+
+&lt;p&gt;ちなみにアプリケーションを書くためのエディタの遍歴としては&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;新卒で入った会社でJavaを&lt;code&gt;eclipse&lt;/code&gt;で書く&lt;/li&gt;
+&lt;li&gt;PHPを各会社を作る。PHPを&lt;code&gt;eclipse+PDT&lt;/code&gt;で書く&lt;/li&gt;
+&lt;li&gt;Perlを書くために&lt;code&gt;emacs&lt;/code&gt;を使い始める&lt;/li&gt;
+&lt;li&gt;面倒見るのが面倒になって&lt;code&gt;SublimeText&lt;/code&gt;に乗り換え&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;と言った感じ。&lt;/p&gt;
+
+&lt;h2 id=&#34;なぜvimを始めるのか&#34;&gt;なぜVimを始めるのか&lt;/h2&gt;
+
+&lt;p&gt;これまで、Mac上でコードを書いていたのだけど、
+リモートのコードを触ることが増えていきそうだから。&lt;/p&gt;
+
+&lt;h2 id=&#34;なぜemacsじゃないのか&#34;&gt;なぜEmacsじゃないのか&lt;/h2&gt;
+
+&lt;p&gt;気分。&lt;/p&gt;
+
+&lt;h2 id=&#34;目標とか&#34;&gt;目標とか&lt;/h2&gt;
+
+&lt;p&gt;まずは、Macの上でVimを使いこなせるようになる。
+ただ、リモートでの作業もできるようにすることが趣旨の一つではあるので、その辺のポータビリティも考えないといけない。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.vim&lt;/code&gt;を持っていく+α&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;くらいで環境を再現できるくらいに止めないといけない。&lt;/p&gt;
+
+&lt;h2 id=&#34;1日目にやったこと&#34;&gt;1日目にやったこと&lt;/h2&gt;
+
+&lt;h3 id=&#34;vimのインストール&#34;&gt;Vimのインストール&lt;/h3&gt;
+
+&lt;p&gt;素で入ってるVimよりもバージョンが進んでるようだったのでHomebrewのVimを入れる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;➜  ~  vim --version
+VIM - Vi IMproved 7.3 (2010 Aug 15, compiled Oct 27 2015 16:22:14)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;➜  ~  brew info vim
+vim: stable 7.4.1301, HEAD
+Vi &amp;quot;workalike&amp;quot; with many additional features
+http://www.vim.org/
+Conflicts with: ex-vi
+/usr/local/Cellar/vim/7.4.1301 (1,623 files, 24.8M) *
+  Built from source with: --override-system-vi --with-lua --with-luajit
+From: https://github.com/Homebrew/homebrew/blob/master/Library/Formula/vim.rb
+==&amp;gt; Dependencies
+Optional: lua ✘, luajit ✘
+==&amp;gt; Options
+--disable-nls
+	Build vim without National Language Support (translated messages, keymaps)
+--override-system-vi
+	Override system vi
+--with-client-server
+	Enable client/server mode
+--with-lua
+	Build vim with lua support
+--with-luajit
+	Build with luajit support
+--with-mzscheme
+	Build vim with mzscheme support
+--with-python3
+	Build vim with python3 instead of python[2] support
+--with-tcl
+	Build vim with tcl support
+--without-perl
+	Build vim without perl support
+--without-python
+	Build vim without python support
+--without-ruby
+	Build vim without ruby support
+--HEAD
+	Install HEAD version
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;システムのviを置き換えること&lt;/li&gt;
+&lt;li&gt;仕入れた情報によれば、NeoCompleteを使うのであれluaが必要&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ということだったので&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--override-system-vi&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--with-lua&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--with-luajit&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を使って&lt;a href=&#34;https://github.com/massat/bootstrap/commit/b95900d50a51bcd441487acd8f249a5e5f111283&#34;&gt;インストールするようにした&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&#34;vimtutor-をやった&#34;&gt;vimtutor をやった&lt;/h3&gt;
+
+&lt;p&gt;いろいろ学びがありました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;0&lt;/code&gt; で行頭移動&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$&lt;/code&gt; で行末移動&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;知らなかった。&lt;/p&gt;
+
+&lt;h3 id=&#34;本をポチった&#34;&gt;本をポチった&lt;/h3&gt;
+
+&lt;iframe src=&#34;http://rcm-fe.amazon-adsystem.com/e/cm?t=genteitimesne-22&amp;o=9&amp;p=8&amp;l=as1&amp;asins=4048916599&amp;ref=qf_sp_asin_til&amp;fc1=000000&amp;IS2=1&amp;lt1=_blank&amp;m=amazon&amp;lc1=0000FF&amp;bc1=000000&amp;bg1=FFFFFF&amp;f=ifr&#34; style=&#34;width:120px;height:240px;&#34; scrolling=&#34;no&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; frameborder=&#34;0&#34;&gt;&lt;/iframe&gt;
+
+&lt;h3 id=&#34;社内slackに-vim-チャネルを作った&#34;&gt;社内Slackに #vim チャネルを作った&lt;/h3&gt;
+
+&lt;p&gt;社内にVimmerがいます。&lt;/p&gt;
+
+&lt;h2 id=&#34;todo&#34;&gt;TODO&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;かっちょいいテーマにしたい&lt;/li&gt;
+&lt;li&gt;ファイル名のいい感じの検索ができるようにしたい&lt;/li&gt;
+&lt;li&gt;アプリケーションコードのいい感じの補完、シンボルへのジャンプなどができるようにしたい&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bzip2 on massat log</title>
+    <link>https://massat.github.io/categories/bzip2/index.xml</link>
+    <description>Recent content in Bzip2 on massat log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <atom:link href="https://massat.github.io/categories/bzip2/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>bzip2したSQLからリストアするコマンド</title>
+      <link>https://massat.github.io/2016/02/19/bzip2sitasqlkararisutoasurukomando/</link>
+      <pubDate>Fri, 19 Feb 2016 18:14:25 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2016/02/19/bzip2sitasqlkararisutoasurukomando/</guid>
+      <description>&lt;p&gt;&lt;code&gt;mysqldump&lt;/code&gt; したデータを &lt;code&gt;bzip2&lt;/code&gt; で固めたアーカイブからリストアするコマンドメモ&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ bunzip2 &amp;lt; ./dump.sql.bz2 | mysql -u user -p database
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;という感じ。仕事では間で &lt;code&gt;sed&lt;/code&gt; かましたりしてるので実際には&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ bunzip2 &amp;lt; ./dump.sql.bz2 | sed -f path/to/sed |  mysql -u user -p database
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;みたいにやっている。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

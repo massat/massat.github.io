@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kamakura.Go on massat log</title>
+    <link>https://massat.github.io/categories/kamakura.go/index.xml</link>
+    <description>Recent content in Kamakura.Go on massat log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <atom:link href="https://massat.github.io/categories/kamakura.go/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>kamakura.go #1 を開催しました。</title>
+      <link>https://massat.github.io/2015/03/03/kamakurago-vol1/</link>
+      <pubDate>Tue, 03 Mar 2015 00:06:43 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2015/03/03/kamakurago-vol1/</guid>
+      <description>&lt;p&gt;2015/02/28（土）に &lt;a href=&#34;http://kamakura-go.connpass.com/event/11080/&#34;&gt;kamakura.go #1&lt;/a&gt;を開催しました。
+ぶっちゃけてはゆくゆく会社の宣伝になれば、というオモイもありつつですが、
+一番はGoをはじめていくにあたって、身近にコミュニティがあったほうが何かと楽しいしプラスしかないし最高だろうってところです。&lt;/p&gt;
+
+&lt;p&gt;自分がしっかり集中してGoを書く時間をとりたかったので、いわゆるもくもく会の形式でやってみました。
+楽しかったです。参加いただいた皆様、本当にありがとうございました！&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;様子&#34;&gt;様子&lt;/h2&gt;
+
+&lt;h3 id=&#34;もくもく中&#34;&gt;もくもく中&lt;/h3&gt;
+
+&lt;p&gt;&lt;blockquote class=&#34;twitter-tweet&#34; lang=&#34;ja&#34;&gt;&lt;p&gt;&lt;a href=&#34;https://twitter.com/hashtag/kamakurago?src=hash&#34;&gt;#kamakurago&lt;/a&gt; &lt;a href=&#34;http://t.co/QDK3VrDgmw&#34;&gt;pic.twitter.com/QDK3VrDgmw&lt;/a&gt;&lt;/p&gt;&amp;mdash; 平井雅人 (@massat) &lt;a href=&#34;https://twitter.com/massat/status/571573142075781120&#34;&gt;2015, 2月 28&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;//platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;発表&#34;&gt;発表&lt;/h3&gt;
+
+&lt;p&gt;自分のもの。&lt;/p&gt;
+
+&lt;script async class=&#34;speakerdeck-embed&#34; data-id=&#34;a91704ea4cd7427aaadc4781ab823bf4&#34; data-ratio=&#34;1.77777777777778&#34; src=&#34;//speakerdeck.com/assets/embed.js&#34;&gt;&lt;/script&gt;
+
+&lt;p&gt;参加者の皆様のものも&lt;a href=&#34;http://kamakura-go.connpass.com/event/11080/presentation/&#34;&gt;こちら&lt;/a&gt;にあがっています。&lt;/p&gt;
+
+&lt;h3 id=&#34;懇親会&#34;&gt;懇親会&lt;/h3&gt;
+
+&lt;p&gt;&lt;blockquote class=&#34;twitter-tweet&#34; lang=&#34;ja&#34;&gt;&lt;p&gt;これが &lt;a href=&#34;https://twitter.com/hashtag/kamakurago?src=hash&#34;&gt;#kamakurago&lt;/a&gt; だ &lt;a href=&#34;http://t.co/VdXbOZxVfs&#34;&gt;pic.twitter.com/VdXbOZxVfs&lt;/a&gt;&lt;/p&gt;&amp;mdash; 平井雅人 (@massat) &lt;a href=&#34;https://twitter.com/massat/status/571627840094932993&#34;&gt;2015, 2月 28&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;//platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;ふりかえって&#34;&gt;ふりかえって&lt;/h2&gt;
+
+&lt;h3 id=&#34;よかったところ&#34;&gt;よかったところ&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;初回から10名規模で開催できて、大きなトラブルもなかった&lt;/li&gt;
+&lt;li&gt;もくもく会ってそんなに盛んでもないのか、&lt;strong&gt;新鮮だった&lt;/strong&gt; という声が多く概ね好評だったという印象&lt;/li&gt;
+&lt;li&gt;予定になかった発表準備時間を設けたら、多くの人が発表をしてくれた&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;反省点&#34;&gt;反省点&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;もくもくし過ぎて、参加者同士のコミュニケーションが殆ど無かった
+
+&lt;ul&gt;
+&lt;li&gt;懇親会で、チャット用意してもいいかもねという声があった&lt;/li&gt;
+&lt;li&gt;暫定的に会社のSlackに、チャネル作って運用開始してみている&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;懇親会での話題がほぼ ingress だった&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;おわりに&#34;&gt;おわりに&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;これからも月１回程度の頻度で開催できたらと思っているので、3月末にやろうかなー。&lt;/li&gt;
+&lt;li&gt;社内Slackの#kamakurago チャネルに興味ある人は、自分宛てに twitter / facebook あたりで声をかけてくれれば invite します。&lt;/li&gt;
+&lt;li&gt;あらためて。ご参加頂いたみなさま、ありがとうございました！&lt;/li&gt;
+&lt;li&gt;あ、&lt;a href=&#34;http://www.iichi.com/company/jobs&#34;&gt;We are Hiring!&lt;/a&gt;です〜&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

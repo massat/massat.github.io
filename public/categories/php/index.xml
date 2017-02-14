@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Php on massat log</title>
+    <link>https://massat.github.io/categories/php/index.xml</link>
+    <description>Recent content in Php on massat log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <atom:link href="https://massat.github.io/categories/php/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Mountain Lion にPHP開発環境をつくった</title>
+      <link>https://massat.github.io/2012/11/24/setup-php-on-mountain-lion/</link>
+      <pubDate>Sat, 24 Nov 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://massat.github.io/2012/11/24/setup-php-on-mountain-lion/</guid>
+      <description>&lt;p&gt;クリーンインストールしてからのPHP環境構築ログ。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;準備&#34;&gt;準備&lt;/h2&gt;
+
+&lt;p&gt;ログインシェルをzshにしたりとかemacsいれたりとかいろいろやったけど、
+PHP環境に関係ある話としては&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.apple.com/downloads/index.action&#34;&gt;Command Line Tools for Xcode&lt;/a&gt; をインストール&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://mxcl.github.com/homebrew/&#34;&gt;Homebrew&lt;/a&gt; をインストール&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;くらい。&lt;/p&gt;
+
+&lt;h2 id=&#34;パッケージインストール&#34;&gt;パッケージインストール&lt;/h2&gt;
+
+&lt;p&gt;レポジトリ追加して&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ brew tap homebrew/dupes
+$ brew tap josegonzalez/php
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;開発で使うあたりをつらつら追加&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ brew install make
+$ brew install httpd mysql memcached mongodb
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;PHP&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ brew install php53 --with-mysql
+$ brew install php53-memcache php53-mongo php53-redis
+$ brew install phpsh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;設定-起動&#34;&gt;設定&amp;amp;起動&lt;/h2&gt;
+
+&lt;p&gt;phpの設定ファイルは &lt;code&gt;/usr/local/etc/php/&lt;/code&gt; あたり、
+apacheの設定ファイルは &lt;code&gt;/usr/local/etc/apache2/&lt;/code&gt; あたりにあるのでVirtualHostをよしなに設定する。&lt;/p&gt;
+
+&lt;p&gt;apacheは &lt;code&gt;/usr/local/sbin/apachectl&lt;/code&gt; あたり、
+mysqlは &lt;code&gt;/usr/local/bin/mysql.server&lt;/code&gt; あたりで起動する。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

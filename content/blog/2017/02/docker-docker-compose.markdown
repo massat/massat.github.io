@@ -1,7 +1,6 @@
 ---
 date: 2017-02-15T15:15:28+09:00
 title: Docker、docker-composeで開発環境作っていく
-draft: true
 categories:
   - docker
   - docker-compose

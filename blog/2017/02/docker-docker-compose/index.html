@@ -11,13 +11,13 @@
 <link rel="apple-touch-icon" href="https://massat.github.io/images/logo.png">
 
 
-<link rel="canonical" href="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">
+<link rel="canonical" href="https://massat.github.io/blog/2017/02/docker-docker-compose/">
 
 
     
     <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
     
-    <title>MySQLでテーブルが使用している容量を確認するSQL - massat log</title>
+    <title>Docker、docker-composeで開発環境作っていく - massat log</title>
     <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
     <script async src="https://cdn.ampproject.org/v0.js"></script>
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
@@ -26,21 +26,21 @@
 <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
 
     
-<meta name="description" content="データベースとテーブルのサイズを確認する方法 - ふってもハレても より。use databaseName; select table_name, engine, table_rows as tbl_rows, avg_row_length as rlen, floor((data_length&#43;index_length)/1024/1024) as allMB, #総容量 floor((data_length)/1024/1024) as dMB, #データ容量 floor((index_length)/1024/1024) as iMB #インデックス容量 from information_schema.tables where table_schema=database() order by (data_length&#43;index_length) desc; &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43; | table_name | engine | tbl_rows | rlen | allMB | dMB | iMB | &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43; | table1 | MyISAM | 156382 | 3738 | 570 | 557 | 12 | | table2 | MyISAM | 185280 | 1624 | 311 | 287 | 24 | | table3 | MyISAM | 208823 | 394 | 103 | 78 | 24 | &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43;  ">
+<meta name="description" content="&lt;p&gt;簡単なRubyアプリケーションの開発環境を docker-compose を使って作ってみる。そのうちCI環境やProduction環境まで同一のDockerイメージを利用した構成にまで発展していく予定。&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
 
-<meta property="og:title" content="MySQLでテーブルが使用している容量を確認するSQL - massat log">
+<meta property="og:title" content="Docker、docker-composeで開発環境作っていく - massat log">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">
+<meta property="og:url" content="https://massat.github.io/blog/2017/02/docker-docker-compose/">
 <meta property="og:image" content="https://massat.github.io/images/default.png">
 <meta property="og:site_name" content="massat log">
-<meta property="og:description" content="データベースとテーブルのサイズを確認する方法 - ふってもハレても より。use databaseName; select table_name, engine, table_rows as tbl_rows, avg_row_length as rlen, floor((data_length&#43;index_length)/1024/1024) as allMB, #総容量 floor((data_length)/1024/1024) as dMB, #データ容量 floor((index_length)/1024/1024) as iMB #インデックス容量 from information_schema.tables where table_schema=database() order by (data_length&#43;index_length) desc; &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43; | table_name | engine | tbl_rows | rlen | allMB | dMB | iMB | &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43; | table1 | MyISAM | 156382 | 3738 | 570 | 557 | 12 | | table2 | MyISAM | 185280 | 1624 | 311 | 287 | 24 | | table3 | MyISAM | 208823 | 394 | 103 | 78 | 24 | &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43;  ">
+<meta property="og:description" content="&lt;p&gt;簡単なRubyアプリケーションの開発環境を docker-compose を使って作ってみる。そのうちCI環境やProduction環境まで同一のDockerイメージを利用した構成にまで発展していく予定。&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="massat log">
-<meta name="twitter:url" content="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">
-<meta name="twitter:title" content="MySQLでテーブルが使用している容量を確認するSQL - massat log">
-<meta name="twitter:description" content="データベースとテーブルのサイズを確認する方法 - ふってもハレても より。use databaseName; select table_name, engine, table_rows as tbl_rows, avg_row_length as rlen, floor((data_length&#43;index_length)/1024/1024) as allMB, #総容量 floor((data_length)/1024/1024) as dMB, #データ容量 floor((index_length)/1024/1024) as iMB #インデックス容量 from information_schema.tables where table_schema=database() order by (data_length&#43;index_length) desc; &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43; | table_name | engine | tbl_rows | rlen | allMB | dMB | iMB | &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43; | table1 | MyISAM | 156382 | 3738 | 570 | 557 | 12 | | table2 | MyISAM | 185280 | 1624 | 311 | 287 | 24 | | table3 | MyISAM | 208823 | 394 | 103 | 78 | 24 | &#43;------------------------------&#43;--------&#43;----------&#43;------&#43;-------&#43;------&#43;------&#43;  ">
+<meta name="twitter:url" content="https://massat.github.io/blog/2017/02/docker-docker-compose/">
+<meta name="twitter:title" content="Docker、docker-composeで開発環境作っていく - massat log">
+<meta name="twitter:description" content="&lt;p&gt;簡単なRubyアプリケーションの開発環境を docker-compose を使って作ってみる。そのうちCI環境やProduction環境まで同一のDockerイメージを利用した構成にまで発展していく予定。&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
 <meta name="twitter:image" content="https://massat.github.io/images/default.png">
 
 
@@ -52,15 +52,15 @@
       "@type": "WebPage",
       "@id":"https:\/\/massat.github.io\/"
     },
-    "headline": "MySQLでテーブルが使用している容量を確認するSQL - massat log",
+    "headline": "Docker、docker-composeで開発環境作っていく - massat log",
     "image": {
       "@type": "ImageObject",
       "url": "https:\/\/massat.github.io\/images\/default.png",
       "height": 800,
       "width": 800
     },
-    "datePublished": "2016-02-19T18:22:49JST",
-    "dateModified": "2016-02-19T18:22:49JST",
+    "datePublished": "2017-02-15T15:15:28JST",
+    "dateModified": "2017-02-15T15:15:28JST",
     "author": {
       "@type": "Person",
       "name": "massat log"
@@ -75,7 +75,7 @@
         "height": 60
       }
     },
-    "description": "データベースとテーブルのサイズを確認する方法 - ふってもハレても より。\nuse databaseName; select table_name, engine, table_rows as tbl_rows, avg_row_length as rlen, floor((data_length\x2bindex_length)\/1024\/1024) as allMB, #総容量 floor((data_length)\/1024\/1024) as dMB, #データ容量 floor((index_length)\/1024\/1024) as iMB #インデックス容量 from information_schema.tables where table_schema=database() order by (data_length\x2bindex_length) desc; \x2b------------------------------\x2b--------\x2b----------\x2b------\x2b-------\x2b------\x2b------\x2b | table_name | engine | tbl_rows | rlen | allMB | dMB | iMB | \x2b------------------------------\x2b--------\x2b----------\x2b------\x2b-------\x2b------\x2b------\x2b | table1 | MyISAM | 156382 | 3738 | 570 | 557 | 12 | | table2 | MyISAM | 185280 | 1624 | 311 | 287 | 24 | | table3 | MyISAM | 208823 | 394 | 103 | 78 | 24 | \x2b------------------------------\x2b--------\x2b----------\x2b------\x2b-------\x2b------\x2b------\x2b  "
+    "description": "\x3cp\x3e簡単なRubyアプリケーションの開発環境を docker-compose を使って作ってみる。\nそのうちCI環境やProduction環境まで同一のDockerイメージを利用した構成にまで発展していく予定。\x3c\/p\x3e\n\n\x3cp\x3e\x3c\/p\x3e"
   }
 </script>
 
@@ -119,14 +119,14 @@
     <main>
       
 <div class="l-container">
-  <article class="single article-ad20739ee574ff81d68c8177f5c709fe">
+  <article class="single article-34e4487460659f1321486c86349b58a0">
   <div class="header-wrapper">
-    <a href="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/" class="thumbnail" title="MySQLでテーブルが使用している容量を確認するSQL"></a>
+    <a href="https://massat.github.io/blog/2017/02/docker-docker-compose/" class="thumbnail" title="Docker、docker-composeで開発環境作っていく"></a>
     <header class="article-header">
       <div class="clearfix">
-        <h1 class="title">MySQLでテーブルが使用している容量を確認するSQL</h1>
+        <h1 class="title">Docker、docker-composeで開発環境作っていく</h1>
         <ul class="p-facts">
-          <li><time datetime="2016-02-19T18:22:49JST">Feb 19, 2016</time></li>
+          <li><time datetime="2017-02-15T15:15:28JST">Feb 15, 2017</time></li>
           <li><a href="https://massat.github.io/blog/">blog</a></li>
           
         </ul>
@@ -135,42 +135,275 @@
   </div>
 
   <aside class="p-share">
-  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f&title=MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f&t=MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f&text=MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-  <a href="http://line.me/R/msg/text/?MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f&title=Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f&t=Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f&text=Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
 </aside>
 
 
-  <div class="article-body"><p><a href="http://d.hatena.ne.jp/sho-yamasaki/20120405/1333640589">データベースとテーブルのサイズを確認する方法 - ふってもハレても</a> より。</p>
+  <div class="article-body"><p>簡単なRubyアプリケーションの開発環境を docker-compose を使って作ってみる。
+そのうちCI環境やProduction環境まで同一のDockerイメージを利用した構成にまで発展していく予定。</p>
 
-<pre><code class="language-sql">use databaseName;
-select
-table_name, engine, table_rows as tbl_rows, avg_row_length as rlen,
-floor((data_length+index_length)/1024/1024) as allMB,  #総容量
-floor((data_length)/1024/1024) as dMB,  #データ容量
-floor((index_length)/1024/1024) as iMB   #インデックス容量
-from information_schema.tables
-where table_schema=database()
-order by (data_length+index_length) desc;
+<p></p>
 
-+------------------------------+--------+----------+------+-------+------+------+
-| table_name                | engine     | tbl_rows  | rlen | allMB | dMB | iMB |
-+------------------------------+--------+----------+------+-------+------+------+
-| table1                 | MyISAM   |   156382     | 3738 |   570 |  557 |   12 |
-| table2                 | MyISAM   |   185280     | 1624 |   311 |  287 |   24 |
-| table3                 | MyISAM   |   208823     |  394  |   103 |   78  |   24 |
-+------------------------------+--------+----------+------+-------+------+------+
+<h2 id="お題">お題</h2>
+
+<p>Rubyで書かれたWebアプリケーションの開発環境。
+シンプルに sinatra でやってみる。</p>
+
+<p>実際の成果物は<a href="https://github.com/massat/rubyapp-on-docker/">ここ</a>にある。</p>
+
+<h2 id="rubyで書かれたwebアプリケーション">Rubyで書かれたWebアプリケーション</h2>
+
+<p>特にRubyでWebアプリケーションを書くことに慣れてるわけではないので悪しからず。
+まずはRackに載せるアプリケーションとして、至極簡単なアプリケーションを<a href="https://github.com/massat/rubyapp-on-docker/commit/259d0af08486aabf4bcd8704dc0ed8470387753c">書いた</a>。</p>
+
+<pre><code>➜  rubyapp-on-docker git:(master) ✗ tree
+.
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+└── config.ru
 </code></pre>
-</div>
+
+<h3 id="gemfile">Gemfile</h3>
+
+<pre><code>source &quot;https://rubygems.org&quot;
+
+ruby '2.4.0'
+
+gem 'sinatra'
+</code></pre>
+
+<h3 id="app-rb">app.rb</h3>
+
+<pre><code>require 'sinatra'
+
+class App &lt; Sinatra::Base
+
+  get '/' do
+    'Hello world!'
+  end
+
+end
+</code></pre>
+
+<h3 id="config-ru">config.ru</h3>
+
+<pre><code>require './app'
+
+run App
+</code></pre>
+
+<p>この状態で <code>bundle &amp;&amp; bundle exec rackup</code> とすれば sinatra が入ってサーバーが立ち上がる。</p>
+
+<script type="text/javascript" src="https://asciinema.org/a/9nzgtie1973ftvzknf70gkmsl.js" id="asciicast-9nzgtie1973ftvzknf70gkmsl" async></script>
+
+<h2 id="dockernize">Dockernize</h2>
+
+<p>次に、Dockerfileを<a href="https://github.com/massat/rubyapp-on-docker/commit/7346070a6d9633182ac3e642d1aac3bf7665f089">書いて</a>、上のアプリケーションをDockerに載せてみる</p>
+
+<pre><code>➜  rubyapp-on-docker git:(master) tree
+.
+├── Dockerfile
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+└── config.ru
+
+0 directories, 5 files
+</code></pre>
+
+<h3 id="dockerfile">Dockerfile</h3>
+
+<pre><code>FROM ruby:2.4.0-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+ADD Gemfile /app
+RUN bundle install
+ADD . /app
+
+EXPOSE 9292
+ENTRYPOINT [ &quot;bundle&quot;, &quot;exec&quot; ]
+CMD [ &quot;rackup&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot; ]
+</code></pre>
+
+<p>この状態で</p>
+
+<pre><code>docker build -t rubyapp-on-docker .
+docker run --rm -p 9292:9292 rubyapp-on-docker
+</code></pre>
+
+<p>すると、コンテナ上でアプリケーションが動く。</p>
+
+<script type="text/javascript" src="https://asciinema.org/a/6nz48bbytkd7mth7cdxqr41qb.js" id="asciicast-6nz48bbytkd7mth7cdxqr41qb" async></script>
+
+<h2 id="docker-compose">Docker Compose</h2>
+
+<p>Dockerを使った開発環境を考えるのであれば、実際的にはデータベースなりなんなりのコンポーネントも欲しくなる。
+Docker Composeを<a href="https://docs.docker.com/compose/install/">インストール</a>して、その辺りを解決してみる。</p>
+
+<p>Docker Compose を使ってMySQLを構成するための docker-compose.yml と初期化のためのSQLを<a href="https://github.com/massat/rubyapp-on-docker/commit/cc20b6a82c3d9a718ba732fd6d9c734912e17ccd">書いた</a>。</p>
+
+<pre><code>➜  rubyapp-on-docker git:(master) tree
+.
+├── Dockerfile
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+├── config.ru
+├── db
+│   ├── 00_schema.sql
+│   └── 01_book.sql
+└── docker-compose.yml
+
+1 directory, 8 files
+</code></pre>
+
+<h3 id="docker-compose-yml">docker-compose.yml</h3>
+
+<pre><code>version: '2.1'
+services:
+  app:
+    build: .
+    ports:
+      - '9292:9292'
+    volumes:
+      - .:/app
+    links:
+      - mysql
+  mysql:
+    image: &quot;mysql&quot;
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - &quot;3306:3306&quot;
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --skip-character-set-client-handshake
+</code></pre>
+
+<p>DockerHub公式のmysqlイメージは、起動した時に <code>/docker-entrypoint-initdb.d</code> というディレクトリにあるファイル(<code>.sh</code>, <code>.sql</code>, <code>.sql.gz</code>)を実行してくれるので、ソースファイル上の <code>db</code> ディレクトリに初期化のためのSQLを置いて、そこを <code>/docker-entrypoint-initdb.d</code> にマウントさせた。
+また、 <code>command</code> で起動コマンドを上書きして character set 周りの調整をしている。</p>
+
+<h3 id="初期化のためのsql">初期化のためのsql</h3>
+
+<h4 id="db-00-schema-sql">db/00_schema.sql</h4>
+
+<pre><code>create table `book` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(256) NOT NULL,
+    `created` DATETIME NOT NULL,
+    `updated` DATETIME NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=Innodb DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci;
+</code></pre>
+
+<h4 id="db-01-book-sql">db/01_book.sql</h4>
+
+<pre><code>INSERT INTO `book` (`title`, `created`, `updated`) VALUES
+('ピアノの森', NOW(), NOW()),
+('ダンジョン飯', NOW(), NOW()),
+('花男', NOW(), NOW()),
+('蒼天航路', NOW(), NOW()),
+('SLAM DUNK', NOW(), NOW())
+;
+</code></pre>
+
+<p>この状態で <code>docker-compose up</code> すれば、RubyアプリケーションとMySQLが立ち上がる。</p>
+
+<script type="text/javascript" src="https://asciinema.org/a/c2zml3ttqf2gey7p2ssa4itec.js" id="asciicast-c2zml3ttqf2gey7p2ssa4itec" async></script>
+
+<h3 id="rubyアプリケーションからmysqlに接続する">RubyアプリケーションからMySQLに接続する</h3>
+
+<h4 id="mysql2">mysql2</h4>
+
+<p><code>mysql2</code> をインストールするためにDockerfileとGemfileを<a href="https://github.com/massat/rubyapp-on-docker/commit/777e1f7d64149c064bbbbe59631c0940c3818247">修正する</a></p>
+
+<h5 id="dockerfile-1">Dockerfile</h5>
+
+<pre><code>FROM ruby:2.4.0-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN apk add --update \
+  alpine-sdk \
+  mariadb-dev \
+  &amp;&amp; rm -rf /var/cache/apk/* \
+  &amp;&amp; rm -rf /usr/lib/mysqld*
+
+ADD Gemfile /app
+RUN bundle install
+ADD . /app
+
+EXPOSE 9292
+ENTRYPOINT [ &quot;bundle&quot;, &quot;exec&quot; ]
+CMD [ &quot;rackup&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot; ]
+</code></pre>
+
+<p><code>mysql2</code>のコンパイルに必要なものをあれこれ入れている。</p>
+
+<h5 id="gemfile-1">Gemfile</h5>
+
+<pre><code>source &quot;https://rubygems.org&quot;
+
+ruby '2.4.0'
+
+gem 'mysql2'
+gem 'sinatra'
+</code></pre>
+
+<h4 id="mysqlから値を返す">MySQLから値を返す</h4>
+
+<p>アプリケーションからDB参照して<a href="https://github.com/massat/rubyapp-on-docker/commit/666e1e0ac00a11b3cf53c2e879c99ebff3afe191">値を返すようにする</a></p>
+
+<h5 id="app-rb-1">app.rb</h5>
+
+<pre><code>require 'json'
+require 'mysql2'
+require 'sinatra'
+
+class App &lt; Sinatra::Base
+
+  get '/' do
+    mysql = Mysql2::Client.new(
+      host: 'mysql',
+      username: 'app',
+      password: 'app',
+      database: 'app'
+    )
+    entries = mysql.query('SELECT * FROM `book`').entries
+
+    JSON.generate(entries)
+  end
+
+end
+</code></pre>
+
+<script type="text/javascript" src="https://asciinema.org/a/6zjj4pw7s6n4i8efhgsohhfy0.js" id="asciicast-6zjj4pw7s6n4i8efhgsohhfy0" async></script>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>記事としては長くなったが、Dockerfile と docker-compose.yml の記述だけで、手元にRuby x MySQLな開発環境が作れる。
+実際的にはアプリケーションサーバーのオートリロードとか、<a href="https://docs.docker.com/compose/startup-order/">MySQLが起動するまでアプリケーションサーバーは待機する</a>とか、さらなる調整は必要そう。</p>
+
+<p>プロジェクトが発展したら、ビルド済みのイメージを使うとかした方が良さそう。
+次は、CIを同一のDockerイメージを使って回すことをやろうかと思っている。</p></div>
 
   <aside class="p-share">
-  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f&title=MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f&t=MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f&text=MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-  <a href="http://line.me/R/msg/text/?MySQL%e3%81%a7%e3%83%86%e3%83%bc%e3%83%96%e3%83%ab%e3%81%8c%e4%bd%bf%e7%94%a8%e3%81%97%e3%81%a6%e3%81%84%e3%82%8b%e5%ae%b9%e9%87%8f%e3%82%92%e7%a2%ba%e8%aa%8d%e3%81%99%e3%82%8bSQL https%3a%2f%2fmassat.github.io%2fblog%2f2016%2f02%2f19%2fmysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f&title=Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f&t=Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f&text=Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Docker%e3%80%81docker-compose%e3%81%a7%e9%96%8b%e7%99%ba%e7%92%b0%e5%a2%83%e4%bd%9c%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f https%3a%2f%2fmassat.github.io%2fblog%2f2017%2f02%2fdocker-docker-compose%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
 </aside>
 
 
@@ -181,7 +414,7 @@ order by (data_length+index_length) desc;
         
         <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://massat.github.io/blog/" itemprop="url"><span itemprop="title">blog</span></a></li>
         
-        <li>MySQLでテーブルが使用している容量を確認するSQL</li>
+        <li>Docker、docker-composeで開発環境作っていく</li>
       </ol>
 
       
@@ -192,7 +425,11 @@ order by (data_length+index_length) desc;
           <header><a href="https://massat.github.io/categories/">categories</a></header>
           <ul>
             
-            <li><a href="https://massat.github.io/categories/mysql/">mysql</a></li>
+            <li><a href="https://massat.github.io/categories/docker/">docker</a></li>
+            
+            <li><a href="https://massat.github.io/categories/docker-compose/">docker-compose</a></li>
+            
+            <li><a href="https://massat.github.io/categories/ruby/">ruby</a></li>
             
           </ul>
         </li>
@@ -212,22 +449,7 @@ order by (data_length+index_length) desc;
   <section>
     <header><span>Latests</span></header>
     <ul class="p-articles thin">
-      <li><article class="li sm article-34e4487460659f1321486c86349b58a0">
-  <div class="header-wrapper">
-    <a href="https://massat.github.io/blog/2017/02/docker-docker-compose/" class="thumbnail" title="Docker、docker-composeで開発環境作っていく"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://massat.github.io/blog/2017/02/docker-docker-compose/">Docker、docker-composeで開発環境作っていく</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2017-02-15T15:15:28JST">Feb 15, 2017</time></li>
-          <li><a href="https://massat.github.io/blog/">blog</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-c09a9531d89b5a5e12599f69ccd1b749">
+      <li><article class="li sm article-c09a9531d89b5a5e12599f69ccd1b749">
   <div class="header-wrapper">
     <a href="https://massat.github.io/blog/2016/03/21/be-careful-of-default-args/" class="thumbnail" title="pythonのデフォルト引数の挙動には気をつけよう"></a>
     <header class="article-header">
@@ -280,6 +502,21 @@ order by (data_length+index_length) desc;
         <h2 class="title"><a href="https://massat.github.io/blog/2016/02/19/vim-number-2/">vim#2</a></h2>
         <ul class="p-facts">
           <li><time datetime="2016-02-19T23:08:47JST">Feb 19, 2016</time></li>
+          <li><a href="https://massat.github.io/blog/">blog</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-ad20739ee574ff81d68c8177f5c709fe">
+  <div class="header-wrapper">
+    <a href="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/" class="thumbnail" title="MySQLでテーブルが使用している容量を確認するSQL"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://massat.github.io/blog/2016/02/19/mysqldeteburugashi-yong-siteirurong-liang-woque-ren-surusql/">MySQLでテーブルが使用している容量を確認するSQL</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2016-02-19T18:22:49JST">Feb 19, 2016</time></li>
           <li><a href="https://massat.github.io/blog/">blog</a></li>
           
         </ul>

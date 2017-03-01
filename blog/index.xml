@@ -6,8 +6,270 @@
     <description>Recent content in Blogs on massat log</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Mon, 21 Mar 2016 23:21:04 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 15 Feb 2017 15:15:28 +0900</lastBuildDate>
     <atom:link href="https://massat.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Docker、docker-composeで開発環境作っていく</title>
+      <link>https://massat.github.io/blog/2017/02/docker-docker-compose/</link>
+      <pubDate>Wed, 15 Feb 2017 15:15:28 +0900</pubDate>
+      
+      <guid>https://massat.github.io/blog/2017/02/docker-docker-compose/</guid>
+      <description>&lt;p&gt;簡単なRubyアプリケーションの開発環境を docker-compose を使って作ってみる。
+そのうちCI環境やProduction環境まで同一のDockerイメージを利用した構成にまで発展していく予定。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;お題&#34;&gt;お題&lt;/h2&gt;
+
+&lt;p&gt;Rubyで書かれたWebアプリケーションの開発環境。
+シンプルに sinatra でやってみる。&lt;/p&gt;
+
+&lt;p&gt;実際の成果物は&lt;a href=&#34;https://github.com/massat/rubyapp-on-docker/&#34;&gt;ここ&lt;/a&gt;にある。&lt;/p&gt;
+
+&lt;h2 id=&#34;rubyで書かれたwebアプリケーション&#34;&gt;Rubyで書かれたWebアプリケーション&lt;/h2&gt;
+
+&lt;p&gt;特にRubyでWebアプリケーションを書くことに慣れてるわけではないので悪しからず。
+まずはRackに載せるアプリケーションとして、至極簡単なアプリケーションを&lt;a href=&#34;https://github.com/massat/rubyapp-on-docker/commit/259d0af08486aabf4bcd8704dc0ed8470387753c&#34;&gt;書いた&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;➜  rubyapp-on-docker git:(master) ✗ tree
+.
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+└── config.ru
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;gemfile&#34;&gt;Gemfile&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;source &amp;quot;https://rubygems.org&amp;quot;
+
+ruby &#39;2.4.0&#39;
+
+gem &#39;sinatra&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;app-rb&#34;&gt;app.rb&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;require &#39;sinatra&#39;
+
+class App &amp;lt; Sinatra::Base
+
+  get &#39;/&#39; do
+    &#39;Hello world!&#39;
+  end
+
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;config-ru&#34;&gt;config.ru&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;require &#39;./app&#39;
+
+run App
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;この状態で &lt;code&gt;bundle &amp;amp;&amp;amp; bundle exec rackup&lt;/code&gt; とすれば sinatra が入ってサーバーが立ち上がる。&lt;/p&gt;
+
+&lt;script type=&#34;text/javascript&#34; src=&#34;https://asciinema.org/a/9nzgtie1973ftvzknf70gkmsl.js&#34; id=&#34;asciicast-9nzgtie1973ftvzknf70gkmsl&#34; async&gt;&lt;/script&gt;
+
+&lt;h2 id=&#34;dockernize&#34;&gt;Dockernize&lt;/h2&gt;
+
+&lt;p&gt;次に、Dockerfileを&lt;a href=&#34;https://github.com/massat/rubyapp-on-docker/commit/7346070a6d9633182ac3e642d1aac3bf7665f089&#34;&gt;書いて&lt;/a&gt;、上のアプリケーションをDockerに載せてみる&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;➜  rubyapp-on-docker git:(master) tree
+.
+├── Dockerfile
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+└── config.ru
+
+0 directories, 5 files
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;dockerfile&#34;&gt;Dockerfile&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM ruby:2.4.0-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+ADD Gemfile /app
+RUN bundle install
+ADD . /app
+
+EXPOSE 9292
+ENTRYPOINT [ &amp;quot;bundle&amp;quot;, &amp;quot;exec&amp;quot; ]
+CMD [ &amp;quot;rackup&amp;quot;, &amp;quot;--host&amp;quot;, &amp;quot;0.0.0.0&amp;quot; ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;この状態で&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;docker build -t rubyapp-on-docker .
+docker run --rm -p 9292:9292 rubyapp-on-docker
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;すると、コンテナ上でアプリケーションが動く。&lt;/p&gt;
+
+&lt;script type=&#34;text/javascript&#34; src=&#34;https://asciinema.org/a/6nz48bbytkd7mth7cdxqr41qb.js&#34; id=&#34;asciicast-6nz48bbytkd7mth7cdxqr41qb&#34; async&gt;&lt;/script&gt;
+
+&lt;h2 id=&#34;docker-compose&#34;&gt;Docker Compose&lt;/h2&gt;
+
+&lt;p&gt;Dockerを使った開発環境を考えるのであれば、実際的にはデータベースなりなんなりのコンポーネントも欲しくなる。
+Docker Composeを&lt;a href=&#34;https://docs.docker.com/compose/install/&#34;&gt;インストール&lt;/a&gt;して、その辺りを解決してみる。&lt;/p&gt;
+
+&lt;p&gt;Docker Compose を使ってMySQLを構成するための docker-compose.yml と初期化のためのSQLを&lt;a href=&#34;https://github.com/massat/rubyapp-on-docker/commit/cc20b6a82c3d9a718ba732fd6d9c734912e17ccd&#34;&gt;書いた&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;➜  rubyapp-on-docker git:(master) tree
+.
+├── Dockerfile
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+├── config.ru
+├── db
+│   ├── 00_schema.sql
+│   └── 01_book.sql
+└── docker-compose.yml
+
+1 directory, 8 files
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;docker-compose-yml&#34;&gt;docker-compose.yml&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;version: &#39;2.1&#39;
+services:
+  app:
+    build: .
+    ports:
+      - &#39;9292:9292&#39;
+    volumes:
+      - .:/app
+    links:
+      - mysql
+  mysql:
+    image: &amp;quot;mysql&amp;quot;
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - &amp;quot;3306:3306&amp;quot;
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --skip-character-set-client-handshake
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;DockerHub公式のmysqlイメージは、起動した時に &lt;code&gt;/docker-entrypoint-initdb.d&lt;/code&gt; というディレクトリにあるファイル(&lt;code&gt;.sh&lt;/code&gt;, &lt;code&gt;.sql&lt;/code&gt;, &lt;code&gt;.sql.gz&lt;/code&gt;)を実行してくれるので、ソースファイル上の &lt;code&gt;db&lt;/code&gt; ディレクトリに初期化のためのSQLを置いて、そこを &lt;code&gt;/docker-entrypoint-initdb.d&lt;/code&gt; にマウントさせた。
+また、 &lt;code&gt;command&lt;/code&gt; で起動コマンドを上書きして character set 周りの調整をしている。&lt;/p&gt;
+
+&lt;h3 id=&#34;初期化のためのsql&#34;&gt;初期化のためのsql&lt;/h3&gt;
+
+&lt;h4 id=&#34;db-00-schema-sql&#34;&gt;db/00_schema.sql&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;create table `book` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(256) NOT NULL,
+    `created` DATETIME NOT NULL,
+    `updated` DATETIME NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=Innodb DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;db-01-book-sql&#34;&gt;db/01_book.sql&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;INSERT INTO `book` (`title`, `created`, `updated`) VALUES
+(&#39;ピアノの森&#39;, NOW(), NOW()),
+(&#39;ダンジョン飯&#39;, NOW(), NOW()),
+(&#39;花男&#39;, NOW(), NOW()),
+(&#39;蒼天航路&#39;, NOW(), NOW()),
+(&#39;SLAM DUNK&#39;, NOW(), NOW())
+;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;この状態で &lt;code&gt;docker-compose up&lt;/code&gt; すれば、RubyアプリケーションとMySQLが立ち上がる。&lt;/p&gt;
+
+&lt;script type=&#34;text/javascript&#34; src=&#34;https://asciinema.org/a/c2zml3ttqf2gey7p2ssa4itec.js&#34; id=&#34;asciicast-c2zml3ttqf2gey7p2ssa4itec&#34; async&gt;&lt;/script&gt;
+
+&lt;h3 id=&#34;rubyアプリケーションからmysqlに接続する&#34;&gt;RubyアプリケーションからMySQLに接続する&lt;/h3&gt;
+
+&lt;h4 id=&#34;mysql2&#34;&gt;mysql2&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;mysql2&lt;/code&gt; をインストールするためにDockerfileとGemfileを&lt;a href=&#34;https://github.com/massat/rubyapp-on-docker/commit/777e1f7d64149c064bbbbe59631c0940c3818247&#34;&gt;修正する&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5 id=&#34;dockerfile-1&#34;&gt;Dockerfile&lt;/h5&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM ruby:2.4.0-alpine
+
+RUN mkdir /app
+WORKDIR /app
+
+RUN apk add --update \
+  alpine-sdk \
+  mariadb-dev \
+  &amp;amp;&amp;amp; rm -rf /var/cache/apk/* \
+  &amp;amp;&amp;amp; rm -rf /usr/lib/mysqld*
+
+ADD Gemfile /app
+RUN bundle install
+ADD . /app
+
+EXPOSE 9292
+ENTRYPOINT [ &amp;quot;bundle&amp;quot;, &amp;quot;exec&amp;quot; ]
+CMD [ &amp;quot;rackup&amp;quot;, &amp;quot;--host&amp;quot;, &amp;quot;0.0.0.0&amp;quot; ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;mysql2&lt;/code&gt;のコンパイルに必要なものをあれこれ入れている。&lt;/p&gt;
+
+&lt;h5 id=&#34;gemfile-1&#34;&gt;Gemfile&lt;/h5&gt;
+
+&lt;pre&gt;&lt;code&gt;source &amp;quot;https://rubygems.org&amp;quot;
+
+ruby &#39;2.4.0&#39;
+
+gem &#39;mysql2&#39;
+gem &#39;sinatra&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;mysqlから値を返す&#34;&gt;MySQLから値を返す&lt;/h4&gt;
+
+&lt;p&gt;アプリケーションからDB参照して&lt;a href=&#34;https://github.com/massat/rubyapp-on-docker/commit/666e1e0ac00a11b3cf53c2e879c99ebff3afe191&#34;&gt;値を返すようにする&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5 id=&#34;app-rb-1&#34;&gt;app.rb&lt;/h5&gt;
+
+&lt;pre&gt;&lt;code&gt;require &#39;json&#39;
+require &#39;mysql2&#39;
+require &#39;sinatra&#39;
+
+class App &amp;lt; Sinatra::Base
+
+  get &#39;/&#39; do
+    mysql = Mysql2::Client.new(
+      host: &#39;mysql&#39;,
+      username: &#39;app&#39;,
+      password: &#39;app&#39;,
+      database: &#39;app&#39;
+    )
+    entries = mysql.query(&#39;SELECT * FROM `book`&#39;).entries
+
+    JSON.generate(entries)
+  end
+
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;script type=&#34;text/javascript&#34; src=&#34;https://asciinema.org/a/6zjj4pw7s6n4i8efhgsohhfy0.js&#34; id=&#34;asciicast-6zjj4pw7s6n4i8efhgsohhfy0&#34; async&gt;&lt;/script&gt;
+
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+
+&lt;p&gt;記事としては長くなったが、Dockerfile と docker-compose.yml の記述だけで、手元にRuby x MySQLな開発環境が作れる。
+実際的にはアプリケーションサーバーのオートリロードとか、&lt;a href=&#34;https://docs.docker.com/compose/startup-order/&#34;&gt;MySQLが起動するまでアプリケーションサーバーは待機する&lt;/a&gt;とか、さらなる調整は必要そう。&lt;/p&gt;
+
+&lt;p&gt;プロジェクトが発展したら、ビルド済みのイメージを使うとかした方が良さそう。
+次は、CIを同一のDockerイメージを使って回すことをやろうかと思っている。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>pythonのデフォルト引数の挙動には気をつけよう</title>
@@ -986,18 +1248,6 @@ apacheの設定ファイルは &lt;code&gt;/usr/local/etc/apache2/&lt;/code&gt; 
 
 &lt;p&gt;apacheは &lt;code&gt;/usr/local/sbin/apachectl&lt;/code&gt; あたり、
 mysqlは &lt;code&gt;/usr/local/bin/mysql.server&lt;/code&gt; あたりで起動する。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>古いログファイルをarchiveしとくスクリプト</title>
-      <link>https://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs/</link>
-      <pubDate>Wed, 21 Nov 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://massat.github.io/blog/2012/11/21/a-script-compressing-old-logs/</guid>
-      <description>&lt;p&gt;書いたのではっとく&lt;/p&gt;
-
-&lt;p&gt;{% gist 4122658 %}&lt;/p&gt;
-</description>
     </item>
     
   </channel>

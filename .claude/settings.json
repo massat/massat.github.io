@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git pull:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git reset:*)",
+      "List(*)",
+      "mcp__obsidian-mcp-tools__*",
+      "Read(~/.zshrc)",
+      "WebFetch(domain:docs.anthropic.com)"
+    ],
+    "deny": ["Bash(curl:*)"]
+  },
+  "enabledMcpjsonServers": ["obsidian"]
+}

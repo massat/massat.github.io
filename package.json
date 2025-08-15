@@ -5,12 +5,13 @@
   "main": "build.js",
   "scripts": {
     "build": "node build.js",
-    "dev": "node build.js && open dist/index.html"
+    "dev": "node build.js && open dist/index.html",
+    "prepare": "husky"
   },
-  "dependencies": {},
   "devDependencies": {
-    "marked": "^12.0.0",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "husky": "^9.1.7",
+    "marked": "^12.0.0"
   },
   "keywords": [
     "portfolio",

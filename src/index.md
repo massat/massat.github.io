@@ -1,8 +1,5 @@
 # 平井雅人 | AWS・SRE エンジニア
 
-**連絡先:** masato.hirai@gmail.com
-**GitHub:** https://github.com/massat
-
 ## プロフィール
 
 Web 業界でのソフトウェアエンジニア経験 18 年。AWS 環境でのプロダクト運用、SRE、DevOps 領域を専門とする。
@@ -32,31 +29,29 @@ _ハンドメイド作品マーケットプレイスの立ち上げ・運用_
 
 ### プログラミング言語
 
-| 言語       | 経験年数 | 備考     |
-| ---------- | -------- | -------- |
-| PHP        | 20 年    | 主要言語 |
-| Ruby       | 10 年    |          |
-| TypeScript | 5 年     |          |
-| Python     | 5 年     |          |
+- **PHP** 20 年
+- **Ruby** 10 年
+- **TypeScript** 5 年
+- **Python** 5 年
 
 ### AWS サービス
 
-**コンピューティング:** EC2、ECS、Lambda
-**ストレージ:** S3
-**データベース:** RDS、ElastiCache
-**ネットワーク:** CloudFront、Route53
-**検索:** OpenSearch
-**通知・メッセージング:** SES、SNS、SQS
-**インフラ管理:** AWS CDK（CloudFormation）
+- **コンピューティング:** EC2、ECS、Lambda
+- **ストレージ:** S3
+- **データベース:** RDS、ElastiCache
+- **ネットワーク:** CloudFront、Route53
+- **検索:** OpenSearch
+- **通知・メッセージング:** SES、SNS、SQS
+- **インフラ管理:** AWS CDK（CloudFormation）
 
 ### DevOps・インフラ
 
-**CI/CD:** GitHub Actions
-**Infrastructure as Code:** AWS CDK
-**コンテナ:** Docker
-**Web サーバー:** Nginx、Apache
-**データベース:** MySQL、Redis、Elasticsearch
-**監視:** Sentry、AWS CloudWatch
+- **CI/CD:** GitHub Actions
+- **Infrastructure as Code:** AWS CDK
+- **コンテナ:** Docker
+- **Web サーバー:** Nginx、Apache
+- **データベース:** MySQL、Redis、Elasticsearch
+- **監視:** Sentry、AWS CloudWatch
 
 ## 対応可能業務
 
@@ -75,5 +70,5 @@ _ハンドメイド作品マーケットプレイスの立ち上げ・運用_
 
 ## 連絡先
 
-**Email:** masato.hirai@gmail.com
-**GitHub:** https://github.com/massat
+- **Email:** masato.hirai@gmail.com
+- **GitHub:** https://github.com/massat

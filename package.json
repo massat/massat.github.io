@@ -1,0 +1,22 @@
+{
+  "name": "portfolio-site",
+  "version": "1.0.0",
+  "description": "Portfolio site for Masato Hirai",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js && open dist/index.html"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "marked": "^12.0.0",
+    "fs-extra": "^11.2.0"
+  },
+  "keywords": [
+    "portfolio",
+    "markdown",
+    "static-site"
+  ],
+  "author": "Masato Hirai",
+  "license": "MIT"
+}

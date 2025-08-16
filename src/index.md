@@ -70,5 +70,6 @@ _ハンドメイド作品マーケットプレイスの立ち上げ・運用_
 
 ## 連絡先
 
-- **Email:** masato.hirai@gmail.com
 - **GitHub:** https://github.com/massat
+- **Twitter:** https://x.com/massat
+- **お仕事のご依頼:** [お問い合わせフォーム](https://forms.gle/KTuzM4xJoTm2MWD78)
